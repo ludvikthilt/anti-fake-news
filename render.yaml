@@ -10,11 +10,12 @@ databases:
 services:
   - type: web
     name: antifake-api
-    env: docker
+    runtime: docker
     plan: free
     region: frankfurt
-    dockerContext: ./backend
-    dockerfilePath: ./backend/Dockerfile
+    # Le Dockerfile est cherché dans rootDir.
+    rootDir: ./backend
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health/
     autoDeploy: true
     envVars:
@@ -88,11 +89,11 @@ services:
 
   - type: web
     name: antifake-web
-    env: docker
+    runtime: docker
     plan: free
     region: frankfurt
-    dockerContext: ./frontend
-    dockerfilePath: ./frontend/Dockerfile
+    rootDir: ./frontend
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /
     autoDeploy: true
     envVars:
