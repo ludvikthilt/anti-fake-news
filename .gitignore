@@ -21,3 +21,6 @@ frontend/.env.local
 
 # Outils locaux téléchargés (tunnel de test)
 tools/
+
+# Secrets à coller dans Render (local uniquement)
+.render-env.local
