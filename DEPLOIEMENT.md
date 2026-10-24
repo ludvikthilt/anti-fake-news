@@ -103,6 +103,30 @@ Avec nginx, ajouter `proxy_set_header X-Forwarded-Proto $scheme;` — Django lit
 
 ---
 
+## 3 bis. Render (PaaS, sans serveur à gérer)
+
+Le fichier [render.yaml](render.yaml) décrit la base PostgreSQL, l'API et le front. Render construit
+les deux images Docker à partir du dépôt et fournit HTTPS automatiquement.
+
+1. Pousser le dépôt sur GitHub (voir section 5 bis).
+2. Render → **New +** → **Blueprint** → sélectionner le dépôt. Render lit `render.yaml` et propose
+trois ressources : `antifake-db`, `antifake-api`, `antifake-web`.
+3. Cliquer **Apply**. Le premier build prend quelques minutes ; `antifake-api` reste rouge tant que
+   la base n'est pas prête, puis /api/health/ passe au vert.
+4. Renseigner les variables marquées `sync: false` sur `antifake-api` (clés Tavily, Gemini, Brevo,
+   Google, Telegram…). Render redéploie automatiquement à chaque enregistrement.
+5. Vérifier les adresses : si Render a suffixé un nom (déjà pris), mettre à jour `ALLOWED_HOSTS`,
+   `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `BACKEND_BASE_URL` et `API_URL`
+   du front. `API_URL` est lue à l'exécution : un simple redémarrage suffit, sans rebuild.
+6. Ajouter `https://<front>.onrender.com/compte/google/callback` dans la console Google, puis
+   redéclarer le webhook Telegram sur `https://<api>.onrender.com/api/webhooks/telegram/`.
+
+> **Offre gratuite** : les services s'endorment après une période d'inactivité (le premier appel
+> après réveil prend quelques dizaines de secondes) et le service PostgreSQL gratuit est limité
+> dans le temps. Une analyse lancée juste avant l'endormissement peut rester en `pending` :
+> relancer l'analyse. Pour un usage continu (notifications, campagnes), le plan payant évite ces
+> coupures.
+
 ## 4. Chemin B — serveur classique (sans Docker)
 
 ```bash
@@ -174,6 +198,18 @@ WantedBy=multi-user.target
    À planifier (cron) et à stocker hors de la machine.
 
 ---
+
+## 5 bis. Dépôt GitHub
+
+Le dépôt se crée depuis l'interface GitHub (*New repository*, sans README ni .gitignore), puis :
+```bash
+git remote add origin https://github.com/<compte>/<depot>.git
+git push -u origin main
+```
+Git Credential Manager ouvre le navigateur pour l'authentification. La CI (`.github/workflows/ci.yml`)
+s'exécute ensuite à chaque push : tests backend sur PostgreSQL et build du front.
+
+Les fichiers `.env` ne sont pas suivis (voir `.gitignore`) ; seuls les modèles `.env.example` le sont.
 
 ## 6. Recette après déploiement
 

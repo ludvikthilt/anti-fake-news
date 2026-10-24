@@ -10,11 +10,11 @@ databases:
 services:
   - type: web
     name: antifake-api
-    runtime: docker
+    env: docker
     plan: free
     region: frankfurt
-    rootDir: backend
-    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /api/health/
     autoDeploy: true
     envVars:
@@ -73,6 +73,8 @@ services:
         sync: false
       - key: GOOGLE_OAUTH_CLIENT_SECRET
         sync: false
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        value: https://antifake-web.onrender.com/compte/google/callback
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_BOT_USERNAME
@@ -86,11 +88,12 @@ services:
 
   - type: web
     name: antifake-web
-    runtime: docker
+    env: docker
     plan: free
     region: frankfurt
-    rootDir: frontend
-    dockerfilePath: ./Dockerfile
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    healthCheckPath: /
     autoDeploy: true
     envVars:
       # Adresse publique de l'API, lue à l'exécution (pas besoin de reconstruire).
