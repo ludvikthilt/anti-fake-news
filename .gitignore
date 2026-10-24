@@ -1,0 +1,23 @@
+# Python / Django
+backend/.venv/
+backend/.env
+__pycache__/
+*.pyc
+backend/staticfiles/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+*.tsbuildinfo
+
+# Divers
+.DS_Store
+*.log
+.resources_tmp/
+
+# Outils locaux téléchargés (tunnel de test)
+tools/

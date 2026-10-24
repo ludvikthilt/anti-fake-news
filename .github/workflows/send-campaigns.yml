@@ -1,0 +1,17 @@
+name: Envoi des campagnes de sensibilisation
+
+on:
+  schedule:
+    # Tous les jours à 08:00 UTC (09:00 heure du Cameroun en hiver).
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  send-campaigns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déclencher l'envoi des campagnes approuvées
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "${{ secrets.BACKEND_URL }}/api/internal/campaigns/send/" \
+            -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}"

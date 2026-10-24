@@ -1,0 +1,104 @@
+:root {
+  /* Marque */
+  --brand-500: #1ca7e0;
+  --brand-700: #0b6a9e;
+  --brand-900: #0e2a3b;
+  --dot-yellow: #f5b700;
+  --action-green: #1e8e5a;
+
+  /* Neutres */
+  --ink: #14202b;
+  --ink-muted: #4a5a68;
+  --line: #d5dee5;
+  --surface: #ffffff;
+  --canvas: #f5f9fc;
+
+  /* Statuts : fond / texte / bordure */
+  --ok-bg: #e3f4ea;
+  --ok-fg: #0b5d38;
+  --ok-bd: #1e8e5a;
+  --warn-bg: #fff1d6;
+  --warn-fg: #7a4b00;
+  --warn-bd: #b26b00;
+  --bad-bg: #fde8e6;
+  --bad-fg: #9b1c14;
+  --bad-bd: #c0392b;
+  --unk-bg: #eceafb;
+  --unk-fg: #4b3f9e;
+  --unk-bd: #6657c4;
+
+  /* Typo */
+  --font-display: "Poppins", "Outfit", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", monospace;
+
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: 1.875rem;
+  --fs-2xl: 2.5rem;
+  --lh-body: 1.6;
+
+  /* Espacement (base 4) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-12: 48px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(20, 32, 43, 0.08), 0 2px 8px rgba(20, 32, 43, 0.06);
+  --shadow-2: 0 4px 16px -2px rgba(14, 42, 59, 0.06);
+  --focus-ring: 0 0 0 3px #fff, 0 0 0 6px var(--brand-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8f0f5;
+    --ink-muted: #a9bac7;
+    --line: #2a3b48;
+    --surface: #15232d;
+    --canvas: #0f1a22;
+    --brand-700: #5bc0ee;
+    --ok-bg: #12301f;
+    --ok-fg: #8fe0b2;
+    --ok-bd: #1e8e5a;
+    --warn-bg: #3a2a08;
+    --warn-fg: #f5c76b;
+    --warn-bd: #b26b00;
+    --bad-bg: #3a1512;
+    --bad-fg: #ffb1a8;
+    --bad-bd: #c0392b;
+    --unk-bg: #231f45;
+    --unk-fg: #b9b0ff;
+    --unk-bd: #6657c4;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #e8f0f5;
+  --ink-muted: #a9bac7;
+  --line: #2a3b48;
+  --surface: #15232d;
+  --canvas: #0f1a22;
+  --brand-700: #5bc0ee;
+  --ok-bg: #12301f;
+  --ok-fg: #8fe0b2;
+  --ok-bd: #1e8e5a;
+  --warn-bg: #3a2a08;
+  --warn-fg: #f5c76b;
+  --warn-bd: #b26b00;
+  --bad-bg: #3a1512;
+  --bad-fg: #ffb1a8;
+  --bad-bd: #c0392b;
+  --unk-bg: #231f45;
+  --unk-fg: #b9b0ff;
+  --unk-bd: #6657c4;
+}

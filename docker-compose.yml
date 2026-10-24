@@ -1,0 +1,48 @@
+name: antifake
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-antifake}
+      POSTGRES_USER: ${POSTGRES_USER:-antifake}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-antifake}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-antifake} -d ${POSTGRES_DB:-antifake}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # Le conteneur parle au service « db », pas au PostgreSQL de l'hôte.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-antifake}:${POSTGRES_PASSWORD:-antifake}@db:5432/${POSTGRES_DB:-antifake}
+      CACHE_BACKEND: db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # URL que le NAVIGATEUR appelle : doit être joignable depuis le téléphone.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Plateforme anti-fake news}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>EDUK-MÉDIA — Défions l'infox</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"tertiary-fixed-dim":"#fbbc0e","primary-fixed":"#cce5ff","status-bad-bg":"#FDE8E6","status-unk-fg":"#4B3F9E","surface-tint":"#006496","tertiary-container":"#815f00","status-bad-fg":"#9B1C14","secondary-container":"#4dc4ff","on-error":"#ffffff","canvas":"#F5F9FC","on-surface-variant":"#40484f","secondary":"#00658b","status-warn-bd":"#B26B00","on-tertiary-fixed-variant":"#5c4300","surface-container":"#e3efff","primary-fixed-dim":"#91cdff","surface-container-high":"#dde9f9","surface-container-highest":"#d7e4f3","surface-bright":"#f7f9ff","on-secondary":"#ffffff","on-secondary-fixed-variant":"#004c6a","error":"#ba1a1a","on-secondary-container":"#004f6d","status-ok-fg":"#0B5D38","tertiary-fixed":"#ffdea0","error-container":"#ffdad6","on-surface":"#111d28","on-background":"#111d28","on-primary":"#ffffff","status-bad-bd":"#C0392B","surface-dim":"#cfdbeb","primary":"#00517b","surface":"#FFFFFF","status-ok-bg":"#E3F4EA","tertiary":"#634800","background":"#f7f9ff","on-tertiary-container":"#ffdea0","status-unk-bg":"#ECEAFB","on-primary-fixed-variant":"#004b72","on-tertiary-fixed":"#261a00","on-tertiary":"#ffffff","action-green":"#1E8E5A","ink-muted":"#4A5A68","secondary-fixed-dim":"#7dd0ff","surface-container-lowest":"#ffffff","secondary-fixed":"#c4e7ff","surface-container-low":"#edf4ff","primary-container":"#0b6a9e","on-primary-fixed":"#001e31","on-secondary-fixed":"#001e2d","status-warn-bg":"#FFF1D6","inverse-surface":"#26323d","status-ok-bd":"#1E8E5A","line":"#D5DEE5","outline":"#707880","surface-variant":"#d7e4f3","on-primary-container":"#cbe5ff","on-error-container":"#93000a","outline-variant":"#c0c7d0","brand-900":"#0E2A3B","status-unk-bd":"#6657C4","inverse-primary":"#91cdff","status-warn-fg":"#7A4B00","inverse-on-surface":"#e8f2ff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"margin-mobile":"1rem","space-lg":"1.5rem","space-md":"1rem","margin":"2rem","space-xl":"2.5rem","gutter":"1.5rem","gutter-mobile":"1rem","space-sm":"0.5rem","space-xs":"0.25rem"},"fontFamily":{"body-lg":["Inter"],"headline-md":["Outfit"],"body-md":["Inter"],"headline-xl-mobile":["Outfit"],"code-sm":["JetBrains Mono"],"label-md":["Inter"],"code-md":["JetBrains Mono"],"headline-sm":["Outfit"],"headline-xl":["Outfit"],"headline-lg":["Outfit"],"body-sm":["Inter"],"label-sm":["Inter"],"headline-lg-mobile":["Outfit"]},"fontSize":{"body-lg":["1.125rem",{"lineHeight":"1.6","fontWeight":"400"}],"headline-md":["1.5rem",{"lineHeight":"1.3","fontWeight":"600"}],"body-md":["1rem",{"lineHeight":"1.5","fontWeight":"400"}],"headline-xl-mobile":["1.875rem",{"lineHeight":"1.25","fontWeight":"700"}],"code-sm":["0.75rem",{"lineHeight":"1.4","fontWeight":"400"}],"label-md":["0.875rem",{"lineHeight":"1.2","fontWeight":"600"}],"code-md":["0.875rem",{"lineHeight":"1.4","fontWeight":"400"}],"headline-sm":["1.25rem",{"lineHeight":"1.4","fontWeight":"600"}],"headline-xl":["2.5rem",{"lineHeight":"1.2","fontWeight":"700"}],"headline-lg":["2rem",{"lineHeight":"1.25","fontWeight":"600"}],"body-sm":["0.875rem",{"lineHeight":"1.5","fontWeight":"400"}],"label-sm":["0.75rem",{"lineHeight":"1.2","fontWeight":"600"}],"headline-lg-mobile":["1.5rem",{"lineHeight":"1.3","fontWeight":"600"}]}}}};</script></head><body class="bg-canvas font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-3 w-full bg-primary-container overflow-hidden relative"><svg class="w-full h-full" fill="none" preserveaspectratio="none" viewbox="0 0 1200 12" xmlns="http://www.w3.org/2000/svg"><defs><pattern height="12" id="losanges-pattern" patternunits="userSpaceOnUse" width="24"><polygon fill="#0B6A9E" points="12,0 24,6 12,12 0,6"></polygon><polygon fill="#1CA7E0" points="12,1.5 21,6 12,10.5 3,6"></polygon><polygon fill="#0E2A3B" points="12,3.5 17,6 12,8.5 7,6"></polygon></pattern></defs><rect fill="url(#losanges-pattern)" height="12" width="100%"></rect></svg></div><div class="h-16 max-w-[1120px] mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="EDUK-MÉDIA Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V1T_al6zBMZPNknobCzQ9GTnrhkEPhSeY1BCuF9PxAcRTREFHVNIytgWrSV1LqwYwFeS5aNKmAJfOZF46cBrW78iTkI71nllC5W9rnnDdpxjdoHXfD69EnBiIZwfW9NZn5GVAM7sqoBVJdc6J7wEWwA89UsMYOLGzuuRHCazhMDDZI03YerE3diqsnBj7Up_gCoZYYcRcw-v3XfaWIZJXGgILk3W0dwznfjx0XuYZV6YVoUp2fyltCTrg"/><div class="flex flex-col"><span class="font-headline-sm text-label-md text-brand-900 tracking-tight leading-none">EDUK-MÉDIA</span><span class="font-code-sm text-code-sm text-ink-muted leading-tight">Défions l'infox · Mfoundi</span></div></div><nav class="hidden lg:flex items-center gap-space-xs" data-active-classes="bg-surface-container text-primary font-label-md"><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-surface-container text-primary font-label-md" data-path="analyser" href="#">Analyser</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="resultats-recents" href="#">Résultats récents</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="wiki-des-insiders" href="#">Wiki des Insiders</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="comment-ca-marche" href="#">Comment ça marche</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="limites-du-service" href="#">Limites du service</a></nav><div class="flex items-center gap-space-md shrink-0"><a class="font-label-md text-label-md px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="connexion" href="#">Se connecter</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-[76px] bg-canvas min-h-screen"><div class="max-w-[1120px] mx-auto px-margin py-space-lg"><div class="flex flex-col w-full">
+<!-- Disclaimer légal & pédagogique obligatoire -->
+<div class="w-full bg-canvas shadow-sm rounded-lg p-space-md mb-space-lg flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-1.5 h-10 bg-tertiary-fixed-dim rounded-full shrink-0"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface tracking-tight">Principe d'investigation civique</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ce site aide à vérifier : il ne prouve pas qu'une information est vraie.</p>
+</div>
+</div>
+<div class="hidden sm:flex items-center gap-space-xs shrink-0 text-ink-muted">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="font-code-sm text-code-sm">Pôle Territorial Mfoundi</span>
+</div>
+</div>
+<!-- En-tête Dossier d'analyse -->
+<div class="relative bg-surface rounded-xl shadow-md p-space-lg md:p-space-xl mb-space-xl overflow-hidden">
+<!-- Liseré supérieur distinctif -->
+<div class="absolute top-0 left-0 right-0 h-[3px] bg-secondary-container"></div>
+<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-space-lg pb-space-lg">
+<div class="flex flex-col gap-space-xs min-w-0">
+<div class="flex flex-wrap items-center gap-space-sm">
+<span class="font-code-md text-code-md px-space-sm py-space-xs rounded bg-surface-container-high text-primary font-medium tracking-wide">
+            EDK-2026-8942
+          </span>
+<span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-status-ok-bg text-status-ok-fg font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check</span>
+            Analyse terminée
+          </span>
+<span class="font-body-sm text-body-sm text-ink-muted">
+            • 24 octobre 2026 à 14h32
+          </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-brand-900 tracking-tight mt-space-xs">
+          Dossier d'investigation numérique
+        </h1>
+<p class="font-body-sm text-body-sm text-ink-muted">
+          Périmètre territorial : Département du Mfoundi (Yaoundé et périphérie académique)
+        </p>
+</div>
+<!-- Boutons d'action -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm shrink-0">
+<div class="relative group">
+<button class="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md" id="copyBtn" onclick="copyAnalysisLink()">
+<span class="material-symbols-outlined text-[18px]">share</span>
+<span id="copyBtnText">Copier le lien</span>
+</button>
+<!-- Bulle de transparence accès -->
+<div class="hidden group-hover:block absolute right-0 top-full mt-1.5 w-64 p-space-sm bg-brand-900 text-surface-bright rounded shadow-lg text-[11px] font-body-sm leading-tight z-20 pointer-events-none">
+<div class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-tertiary-fixed text-[14px] shrink-0 mt-0.5">info</span>
+<span>Le lien est accessible publiquement à toute personne qui le possède.</span>
+</div>
+</div>
+</div>
+<button class="inline-flex items-center justify-center gap-space-xs px-space-md py-space-xs rounded-lg bg-primary-container text-on-primary hover:bg-primary transition-colors font-label-md text-label-md shadow-sm" onclick="window.print()">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Exporter le dossier</span>
+</button>
+</div>
+</div>
+<!-- Objet analysé : Contenu textuel soumis -->
+<div class="bg-surface-container-low rounded-lg p-space-md mt-space-sm">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-ink-muted">Contenu soumis pour examen</span>
+<span class="font-code-sm text-code-sm text-ink-muted">Signalement citoyen #MFI-409</span>
+</div>
+<blockquote class="font-body-lg text-body-lg text-on-surface font-normal italic pl-space-sm py-1 bg-surface-container-lowest/60 rounded">
+        « Annonce de fermeture définitive de tous les lycées du Mfoundi dès ce lundi en raison d'une pénurie de carburant. »
+      </blockquote>
+</div>
+<!-- Badges de classification EMI (Distincts du statut d'investigation) -->
+<div class="flex flex-wrap items-center gap-space-md mt-space-md pt-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-ink-muted">Classification EMI :</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">campaign</span>
+<span>Nature : <strong class="font-semibold">Infox</strong></span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">report</span>
+<span>Type de désordre : <strong class="font-semibold">Désinformation</strong></span>
+<span class="font-body-sm text-body-sm text-ink-muted text-xs">(intention de nuire décelée)</span>
+</div>
+<span class="font-body-sm text-body-sm text-ink-muted ml-auto hidden md:inline-block">Grille d'analyse référentielle UNESCO / EMI</span>
+</div>
+</div>
+<!-- Layout Principal : Grille 8 / 4 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start mb-space-xl">
+<!-- Colonne Principale (8 colonnes) -->
+<div class="lg:col-span-8 flex flex-col gap-space-xl min-w-0">
+<!-- BLOC STATUT : Strictement sobre, rouge brique, sans moralisation -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg overflow-hidden">
+<div class="flex items-center justify-between pb-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-ink-muted">Résultat de la confrontation aux faits</span>
+<span class="font-code-sm text-code-sm text-ink-muted">Protocole v2.4</span>
+</div>
+<div class="p-space-lg rounded-xl bg-status-bad-bg flex flex-col sm:flex-row items-start sm:items-center gap-space-md my-space-sm">
+<div class="w-12 h-12 rounded-full bg-status-bad-bg flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-status-bad-fg text-[32px]">cancel</span>
+</div>
+<div class="flex flex-col gap-0.5 min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-md text-headline-md text-status-bad-fg tracking-tight">Contredite</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-status-bad-bg text-status-bad-fg">Constat d'incompatibilité</span>
+</div>
+<p class="font-body-md text-body-md text-status-bad-fg font-normal leading-relaxed">
+              Une vérification de faits publiée ou plusieurs sources fiables contredisent cette information.
+            </p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm pt-space-md text-ink-muted">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-tertiary">balance</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic">
+              C'est une aide à la décision. C'est vous qui jugez, en ouvrant les sources.
+            </p>
+</div>
+<a class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors inline-flex items-center gap-1" href="#criteres-section">
+<span>Voir les critères détaillés (5/5 examinés)</span>
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+</a>
+</div>
+</section>
+<!-- CHRONOLOGIE DES SOURCES -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs pb-space-lg">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-brand-900 tracking-tight">
+              Chronologie des sources
+            </h2>
+<p class="font-body-sm text-body-sm text-ink-muted">
+              De la plus ancienne trouvée à la plus récente
+            </p>
+</div>
+<span class="font-code-sm text-code-sm text-ink-muted bg-canvas px-space-sm py-1 rounded">
+            4 points de traçabilité
+          </span>
+</div>
+<div class="relative pl-6 sm:pl-8 flex flex-col gap-space-lg">
+<!-- Ligne axiale de temps -->
+<div class="absolute left-2.5 sm:left-3 top-2 bottom-4 w-0.5 bg-surface-container-highest"></div>
+<!-- Étape 1 : Plus ancienne trouvée -->
+<div class="relative flex flex-col gap-space-xs">
+<div class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-status-bad-bg flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-status-bad-fg"></div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-medium text-brand-900">22 oct. 2026 · 18h15</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant">Réseau social</span>
+</div>
+<!-- Pastille DateOrigin : Indexation -->
+<div class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-canvas text-ink-muted font-label-sm text-label-sm shadow-sm" title="Date horodatée lors de la détection initiale par le robot d'indexation citoyen">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span>Indexation</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface">WhatsApp Web (Message transféré fréquemment)</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Message anonyme diffusé en boucle dans des groupes de parents d'élèves annonçant un arrêt immédiat et illimité des cours suite à des pénuries présumées.
+                </p>
+<div class="flex items-center gap-space-sm mt-space-xs font-code-sm text-code-sm text-ink-muted">
+<span>Origine géographique : Inconnue</span>
+<span>•</span>
+<span>Absence de document officiel attaché</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Étape 2 -->
+<div class="relative flex flex-col gap-space-xs">
+<div class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-ink-muted"></div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-medium text-brand-900">23 oct. 2026 · 07h40</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-status-warn-bg text-status-warn-fg">Blog non certifié</span>
+</div>
+<!-- Pastille DateOrigin : Déclarée -->
+<div class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-canvas text-ink-muted font-label-sm text-label-sm shadow-sm" title="Date figurant explicitement dans le corps textuel de l'article">
+<span class="material-symbols-outlined text-[14px]">edit_calendar</span>
+<span>Déclarée</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface">Plateforme "Actu-Cameroun Infos"</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Reprise mot pour mot du message WhatsApp sous un titre racoleur sans citation de sources gouvernementales ni contact du délégué régional.
+                </p>
+<div class="flex items-center gap-space-sm mt-space-xs font-code-sm text-code-sm text-ink-muted">
+<span>URL non sécurisée</span>
+<span>•</span>
+<span>Mentions légales absentes</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Étape 3 -->
+<div class="relative flex flex-col gap-space-xs">
+<div class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-status-ok-bg flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-status-ok-fg"></div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-medium text-brand-900">23 oct. 2026 · 11h20</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-primary">Média officiel</span>
+</div>
+<!-- Pastille DateOrigin : Métadonnée -->
+<div class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-canvas text-ink-muted font-label-sm text-label-sm shadow-sm" title="Date extraite des balises HTML open-graph et données structurées du serveur web">
+<span class="material-symbols-outlined text-[14px]">code</span>
+<span>Métadonnée</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface">Cameroon Tribune (Quotidien bilingue national)</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-medium">
+                  « Le Délégué régional des Enseignements Secondaires du Mfoundi dément formellement tout arrêt des cours et rappelle les sanctions prévues pour propagation de fausses nouvelles. »
+                </p>
+<div class="flex items-center gap-space-sm mt-space-xs font-code-sm text-code-sm text-primary">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Contradiction factuelle directe établie</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Étape 4 -->
+<div class="relative flex flex-col gap-space-xs">
+<div class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-status-ok-bg flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-status-ok-fg"></div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-medium text-brand-900">23 oct. 2026 · 15h00</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-primary">Agence publique</span>
+</div>
+<!-- Pastille DateOrigin : Observée -->
+<div class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-canvas text-ink-muted font-label-sm text-label-sm shadow-sm" title="Instantané certifié avec empreinte SHA-256 archivée par notre infrastructure">
+<span class="material-symbols-outlined text-[14px]">visibility</span>
+<span>Observée</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface">CRTV News &amp; Radio Nationale</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Diffusion de la circulaire ministérielle N°2026/089 du MINESEC confirmant le maintien strict des cours et assurant que le plan d'approvisionnement des transports scolaires est fonctionnel.
+                </p>
+<div class="flex items-center gap-space-sm mt-space-xs font-code-sm text-code-sm text-primary">
+<span class="material-symbols-outlined text-[14px]">link</span>
+<a class="underline hover:text-brand-900 transition-colors" href="#">Consulter l'archive horodatée (Capture #CRTV-9021)</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ACCORDÉON DES 5 CRITÈRES CLÉS -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg" id="criteres-section">
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-brand-900 tracking-tight">
+              Critères clés d'évaluation
+            </h2>
+<p class="font-body-sm text-body-sm text-ink-muted">
+              Grille d'investigation systématique du protocole EDUK-MÉDIA
+            </p>
+</div>
+<span class="px-space-sm py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm">
+            5 / 5 Examinés
+          </span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Critère 1 -->
+<div class="rounded-lg bg-surface-container-low p-space-md transition-all">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-space-sm min-w-0">
+<span class="w-6 h-6 rounded bg-surface text-primary flex items-center justify-center font-code-sm text-code-sm font-semibold shrink-0">1</span>
+<div>
+<h3 class="font-label-md text-label-md text-brand-900">Sources indépendantes</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    3 sources indépendantes et contradictoires fiables identifiées ayant directement documenté la fausseté de la fermeture.
+                  </p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-status-ok-fg font-label-sm text-label-sm shrink-0">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                Validé
+              </span>
+</div>
+</div>
+<!-- Critère 2 -->
+<div class="rounded-lg bg-surface-container-low p-space-md transition-all">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-space-sm min-w-0">
+<span class="w-6 h-6 rounded bg-surface text-primary flex items-center justify-center font-code-sm text-code-sm font-semibold shrink-0">2</span>
+<div>
+<h3 class="font-label-md text-label-md text-brand-900">Fiabilité des sources</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    Élevée pour les démentis officiels (organismes publics certifiés MINESEC et presse institutionnelle de référence).
+                  </p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-status-ok-fg font-label-sm text-label-sm shrink-0">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                Élevée
+              </span>
+</div>
+</div>
+<!-- Critère 3 -->
+<div class="rounded-lg bg-surface-container-low p-space-md transition-all">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-space-sm min-w-0">
+<span class="w-6 h-6 rounded bg-surface text-primary flex items-center justify-center font-code-sm text-code-sm font-semibold shrink-0">3</span>
+<div>
+<h3 class="font-label-md text-label-md text-brand-900">Vérification de faits publiée</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    1 vérification formelle recensée dans l'espace public camerounais par l'organisation StopIntox Cameroun.
+                  </p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-status-ok-fg font-label-sm text-label-sm shrink-0">
+<span class="material-symbols-outlined text-[16px]">fact_check</span>
+                Existe
+              </span>
+</div>
+</div>
+<!-- Critère 4 -->
+<div class="rounded-lg bg-surface-container-low p-space-md transition-all">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-space-sm min-w-0">
+<span class="w-6 h-6 rounded bg-surface text-primary flex items-center justify-center font-code-sm text-code-sm font-semibold shrink-0">4</span>
+<div>
+<h3 class="font-label-md text-label-md text-brand-900">Antériorité temporelle</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    Première trace observée sur réseaux de messagerie le 22 octobre 2026 à 18h15 avant reprise sur les blogs.
+                  </p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-ink-muted font-label-sm text-label-sm shrink-0">
+<span class="material-symbols-outlined text-[16px]">history</span>
+                Tracée
+              </span>
+</div>
+</div>
+<!-- Critère 5 -->
+<div class="rounded-lg bg-surface-container-low p-space-md transition-all">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-space-sm min-w-0">
+<span class="w-6 h-6 rounded bg-surface text-primary flex items-center justify-center font-code-sm text-code-sm font-semibold shrink-0">5</span>
+<div>
+<h3 class="font-label-md text-label-md text-brand-900">Certifications des Insiders</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    4 contributeurs territoriaux certifiés ont corroboré le démenti avec pièces administratives versées au dossier.
+                  </p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-status-ok-fg font-label-sm text-label-sm shrink-0">
+<span class="material-symbols-outlined text-[16px]">shield_person</span>
+                4 Avis
+              </span>
+</div>
+</div>
+</div>
+</section>
+<!-- CERTIFICATIONS DES INSIDERS (Deux blocs distincts) -->
+<section class="flex flex-col gap-space-md">
+<h2 class="font-headline-sm text-headline-sm text-brand-900 tracking-tight">
+          Certifications communautaires et territoriales
+        </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Bloc 1 : Information certifiée -->
+<div class="bg-surface rounded-xl shadow-md p-space-lg flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-status-ok-fg">Attestation de fait</span>
+<span class="inline-flex items-center gap-1 text-status-ok-fg font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                  Certifiée
+                </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-brand-900 mt-1">Information certifiée</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                Le démenti ministériel a été formellement corroboré sur le terrain par nos vérificateurs de confiance au contact direct des établissements de Yaoundé.
+              </p>
+<div class="mt-space-md pt-space-sm bg-surface-container-low p-space-sm rounded">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-sm text-label-sm">JM</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-tight">Jean-Paul M.</span>
+<span class="font-code-sm text-code-sm text-ink-muted">Insider Éducation · Yaoundé IV</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs mt-space-xs pt-space-xs">
+<div class="w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-label-sm text-label-sm">AB</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-tight">Aminatou B.</span>
+<span class="font-code-sm text-code-sm text-ink-muted">Vérificatrice EMI accréditée</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center gap-1.5 text-ink-muted font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">description</span>
+<span>Pièce jointe : Communiqué MINESEC N°2026/089</span>
+</div>
+</div>
+<!-- Bloc 2 : Site certifié / État de la source initiale -->
+<div class="bg-surface rounded-xl shadow-md p-space-lg flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-status-warn-fg">Origine du canal</span>
+<span class="inline-flex items-center gap-1 text-status-bad-fg font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                  Non certifié
+                </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-brand-900 mt-1">Source émettrice</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                Le domaine relais ayant initié la diffusion sur le web public présente les marqueurs caractéristiques d'opacité informationnelle.
+              </p>
+<div class="mt-space-md p-space-sm bg-status-bad-bg rounded flex flex-col gap-1">
+<span class="font-label-md text-label-md text-status-bad-fg">« Source non transparente / Domaine anonyme »</span>
+<p class="font-body-sm text-body-sm text-status-bad-fg text-xs">
+                  Whois masqué, absence de signature journalistique, absence de siège social vérifiable dans le département.
+                </p>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between text-ink-muted font-code-sm text-code-sm">
+<span>Indice de crédibilité domaine : 12 / 100</span>
+<a class="text-primary hover:underline" href="#">Voir l'audit</a>
+</div>
+</div>
+</div>
+</section>
+<!-- VÉRIFICATIONS DE FAITS PUBLIÉES (FactCheckCard) -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">policy</span>
+<h2 class="font-headline-sm text-headline-sm text-brand-900 tracking-tight">
+              Vérification de faits publiée par un tiers
+            </h2>
+</div>
+<span class="font-code-sm text-code-sm text-ink-muted">Indépendance éditoriale</span>
+</div>
+<div class="mt-space-sm p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-label-md text-brand-900 font-bold">StopIntox Cameroun</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface text-primary">Membre réseau vérification</span>
+</div>
+<span class="font-code-sm text-code-sm text-ink-muted">Publié le 23 octobre 2026</span>
+</div>
+<div class="pl-space-sm">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Conclusion telle que publiée :</span>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">
+              « Rumeur infondée : les cours se déroulent normalement dans tous les établissements du Mfoundi »
+            </p>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            L'équipe de StopIntox a contacté directement le cabinet du Ministre des Enseignements Secondaires et s'est rendue aux lycées Général Leclerc et de Ngoa-Ekellé pour constater la présence effective des élèves et enseignants.
+          </p>
+<div class="pt-space-xs flex items-center justify-between flex-wrap gap-space-sm">
+<a class="inline-flex items-center gap-1.5 text-primary hover:text-primary-container font-label-md text-label-md group" href="https://example.org" rel="noopener noreferrer" target="_blank">
+<span>Consulter l'article original de StopIntox</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">open_in_new</span>
+</a>
+<span class="font-code-sm text-code-sm text-ink-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+              Ouverture vers un site tiers hors EDUK-MÉDIA
+            </span>
+</div>
+</div>
+</section>
+</div>
+<!-- Colonne Latérale (4 colonnes) -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- ASSISTANCE & CHATBOT INTERACTIF (Transparence sans verdict) -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg">
+<div class="flex items-center gap-space-xs pb-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-label-md text-brand-900 font-semibold">Assistant d'analyse</h3>
+<span class="font-code-sm text-code-sm text-ink-muted">Guidage pédagogique sans verdict</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs mb-space-md">
+          Une question sur cette analyse ? L'assistant vous éclaire sur les sources et la méthode sans jamais formuler d'avis d'autorité.
+        </p>
+<!-- Zone d'échange simulée interactive -->
+<div class="flex flex-col gap-space-sm mb-space-md">
+<div class="p-space-sm rounded bg-surface-container-low text-on-surface font-body-sm text-body-sm">
+<p class="text-xs font-semibold text-primary mb-1">EDUK-Bot</p>
+            « Bonjour. Je peux vous indiquer qui a signé le démenti, comment vérifier par vous-même ou expliquer les pastilles de date. »
+          </div>
+</div>
+<!-- Suggestions de questions rapides -->
+<div class="flex flex-col gap-1.5 mb-space-md">
+<button class="text-left p-space-xs px-space-sm rounded bg-canvas hover:bg-surface-container-high transition-colors font-body-sm text-body-sm text-on-surface text-xs flex items-center justify-between" onclick="askQuestion('Qui a publié le démenti officiel ?')">
+<span>Qui a publié le démenti officiel ?</span>
+<span class="material-symbols-outlined text-[14px] text-ink-muted">chevron_right</span>
+</button>
+<button class="text-left p-space-xs px-space-sm rounded bg-canvas hover:bg-surface-container-high transition-colors font-body-sm text-body-sm text-on-surface text-xs flex items-center justify-between" onclick="askQuestion('Que signifie la pastille [Indexation] ?')">
+<span>Que signifie la pastille [Indexation] ?</span>
+<span class="material-symbols-outlined text-[14px] text-ink-muted">chevron_right</span>
+</button>
+<button class="text-left p-space-xs px-space-sm rounded bg-canvas hover:bg-surface-container-high transition-colors font-body-sm text-body-sm text-on-surface text-xs flex items-center justify-between" onclick="askQuestion('Où voir la circulaire ministérielle ?')">
+<span>Où voir la circulaire ministérielle ?</span>
+<span class="material-symbols-outlined text-[14px] text-ink-muted">chevron_right</span>
+</button>
+</div>
+<div class="hidden p-space-sm mb-space-md rounded bg-surface-container text-on-surface-variant font-body-sm text-body-sm text-xs" id="botResponse">
+<!-- Injecté dynamiquement -->
+</div>
+<!-- Champ interactif -->
+<form class="relative flex items-center" onsubmit="handleBotSubmit(event)">
+<input class="w-full bg-canvas text-on-surface font-body-sm text-body-sm px-space-sm py-space-xs pr-10 rounded focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="botInput" placeholder="Poser une question concise..." type="text"/>
+<button class="absolute right-1 text-primary hover:text-primary-container p-1 rounded" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</form>
+</section>
+<!-- Synthèse territoriale Mfoundi -->
+<section class="bg-surface rounded-xl shadow-md p-space-lg">
+<h3 class="font-headline-sm text-label-md text-brand-900 font-semibold mb-space-xs">
+          Contexte de circulation territoriale
+        </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+          Données consolidées au sein du bassin d'éducation du Mfoundi.
+        </p>
+<!-- Inline Data Visualisation : Portée territoriale estimée -->
+<div class="p-space-md bg-canvas rounded-lg mb-space-md">
+<div class="flex items-center justify-between text-xs font-code-sm mb-1.5">
+<span class="text-ink-muted">Canaux de propagation</span>
+<span class="text-brand-900 font-semibold">82% Messagerie privée</span>
+</div>
+<!-- Bar visual -->
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden flex">
+<div class="h-full bg-status-bad-fg" style="width: 82%;"></div>
+<div class="h-full bg-status-warn-fg" style="width: 13%;"></div>
+<div class="h-full bg-ink-muted" style="width: 5%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-body-sm text-ink-muted mt-2">
+<span>WhatsApp (82%)</span>
+<span>Web (13%)</span>
+<span>Autres (5%)</span>
+</div>
+</div>
+<!-- Empreinte documentaire -->
+<div class="flex flex-col gap-space-xs font-code-sm text-code-sm text-ink-muted pt-space-xs">
+<div class="flex justify-between">
+<span>Identifiant pérenne</span>
+<span class="text-on-surface font-medium">EDK-2026-8942</span>
+</div>
+<div class="flex justify-between">
+<span>Hash intégrité</span>
+<span class="text-on-surface font-medium">e3b0c442...98fc</span>
+</div>
+<div class="flex justify-between">
+<span>Audit de révision</span>
+<span class="text-on-surface font-medium">Aucune modification</span>
+</div>
+</div>
+</section>
+<!-- SIGNALEMENT D'ANOMALIE & CONTESTATION -->
+<section class="bg-surface-container-low rounded-xl p-space-md">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-ink-muted text-[20px] shrink-0 mt-0.5">feedback</span>
+<div class="flex flex-col">
+<h4 class="font-label-md text-label-md text-brand-900">Signaler une anomalie</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Vous disposez d'un document officiel contradictoire ou avez relevé une erreur méthodologique ?
+            </p>
+<a class="mt-space-sm inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors" href="#">
+<span>Ouvrir un recours sur cette analyse</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Méthode et déontologie -->
+<div class="p-space-sm text-center">
+<a class="font-label-sm text-label-sm text-ink-muted hover:text-brand-900 underline transition-colors" href="#">
+          Consulter le référentiel d'objectivité et charte des Insiders
+        </a>
+</div>
+</div>
+</div>
+<!-- Toast de notification copie de lien -->
+<div class="fixed bottom-6 right-6 bg-brand-900 text-surface-bright px-space-md py-space-sm rounded-lg shadow-xl font-body-sm text-body-sm hidden flex items-center gap-space-xs z-50" id="copyToast">
+<span class="material-symbols-outlined text-action-green text-[18px]">check_circle</span>
+<span>Lien public copié dans le presse-papier</span>
+</div>
+</div>
+<script>
+  function copyAnalysisLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const toast = document.getElementById('copyToast');
+      const btnText = document.getElementById('copyBtnText');
+      if (btnText) btnText.textContent = 'Lien copié !';
+      if (toast) {
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.add('hidden');
+          if (btnText) btnText.textContent = 'Copier le lien';
+        }, 3000);
+      }
+    }).catch(() => {
+      alert("Impossible de copier automatiquement le lien.");
+    });
+  }
+
+  function askQuestion(question) {
+    const input = document.getElementById('botInput');
+    if (input) {
+      input.value = question;
+      handleBotQuestion(question);
+    }
+  }
+
+  function handleBotSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('botInput');
+    if (input && input.value.trim() !== '') {
+      handleBotQuestion(input.value.trim());
+      input.value = '';
+    }
+  }
+
+  function handleBotQuestion(query) {
+    const responseBox = document.getElementById('botResponse');
+    if (!responseBox) return;
+
+    let reply = "L'analyse EDK-2026-8942 rassemble 4 sources horodatées. Nous vous invitons à consulter les démentis du MINESEC et l'enquête de StopIntox Cameroun ci-dessus pour vous forger votre propre jugement.";
+
+    const q = query.toLowerCase();
+    if (q.includes('démenti') || q.includes('qui')) {
+      reply = "Le démenti émane conjointement du Délégué régional des Enseignements Secondaires du Mfoundi et de la circulaire N°2026/089 du MINESEC relayée par Cameroon Tribune et la CRTV.";
+    } else if (q.includes('indexation')) {
+      reply = "La pastille [Indexation] indique le moment précis où notre robot de veille civique a détecté le message dans l'espace numérique, sans présumer de l'heure exacte de sa rédaction première.";
+    } else if (q.includes('circulaire') || q.includes('voir')) {
+      reply = "La circulaire ministérielle N°2026/089 est archivée sous l'empreinte #CRTV-9021 accessible dans la 4e source de la chronologie.";
+    }
+
+    responseBox.innerHTML = `<strong>Réponse :</strong> ${reply}`;
+    responseBox.classList.remove('hidden');
+  }
+</script></div></main><footer class="w-full bg-brand-900 text-on-primary py-space-xl"><div class="max-w-[1120px] mx-auto px-margin flex flex-col gap-space-lg"><div class="p-space-md bg-canvas/10 rounded-lg flex items-start gap-space-md"><span class="material-symbols-outlined text-tertiary-fixed shrink-0 text-[20px]">info</span><p class="font-body-sm text-body-sm text-surface-bright leading-relaxed">Ce site aide à vérifier : il ne prouve pas qu'une information est vraie. Plateforme d'investigation civique et pédagogique pour la détection des manipulations informationnelles.</p></div><div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md pt-space-md"><div class="flex flex-col gap-space-xs"><div class="flex items-center gap-space-sm"><img alt="EDUK-MÉDIA Logo" class="h-7 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida/AEtjO1V1T_al6zBMZPNknobCzQ9GTnrhkEPhSeY1BCuF9PxAcRTREFHVNIytgWrSV1LqwYwFeS5aNKmAJfOZF46cBrW78iTkI71nllC5W9rnnDdpxjdoHXfD69EnBiIZwfW9NZn5GVAM7sqoBVJdc6J7wEWwA89UsMYOLGzuuRHCazhMDDZI03YerE3diqsnBj7Up_gCoZYYcRcw-v3XfaWIZJXGgILk3W0dwznfjx0XuYZV6YVoUp2fyltCTrg"/><span class="font-headline-sm text-headline-sm text-surface-bright">EDUK-MÉDIA</span></div><p class="font-body-sm text-body-sm text-surface-dim">Projet soutenu par l'Union européenne · Pôle territorial Mfoundi</p></div><div class="flex flex-wrap items-center gap-space-md"><a class="font-label-sm text-label-sm text-surface-dim hover:text-surface-bright transition-colors" data-path="confidentialite" href="#">Confidentialité</a><a class="font-label-sm text-label-sm text-surface-dim hover:text-surface-bright transition-colors" data-path="limites-du-service" href="#">Limites du service</a><a class="font-label-sm text-label-sm text-surface-dim hover:text-surface-bright transition-colors" data-path="signaler-une-erreur" href="#">Signaler une erreur</a></div></div><div class="pt-space-sm flex flex-col sm:flex-row items-center justify-between gap-space-xs font-code-sm text-code-sm text-surface-dim/70"><p>© 2025 EDUK-MÉDIA. Initiative d'intégrité informationnelle publique.</p><p>Version d'analyse 2.4-civic</p></div></div></footer></body></html>
