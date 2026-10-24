@@ -1,6 +1,6 @@
-# Plateforme anti-fake news — EDUK-MÉDIA
+# InfoxVerify — concours EDUK-MÉDIA
 
-Plateforme éducative d'**aide à la vérification de l'information**, destinée aux élèves et étudiants du Mfoundi (Cameroun). Elle ne dit jamais « vrai » ni « faux » : elle rassemble des traces (sources, dates, vérifications déjà publiées) et propose un **statut** — c'est une aide à la décision, pas un verdict.
+**InfoxVerify** est un outil éducatif d'**aide à la vérification de l'information**, réalisé pour le concours **EDUK-MÉDIA**, en partenariat avec l'**Union européenne**, et destiné aux élèves et étudiants du Mfoundi (Cameroun). InfoxVerify ne dit jamais « vrai » ni « faux » : l'outil rassemble des traces (sources, dates, vérifications déjà publiées) et propose un **statut** — c'est une aide à la décision, pas un verdict.
 
 > **Ce site aide à vérifier : il ne prouve pas qu'une information est vraie.**
 

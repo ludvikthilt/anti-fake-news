@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import type { AnalysisDetail } from "@/lib/types";
 import StatusCard from "@/components/StatusCard";
@@ -12,8 +13,16 @@ import CriteriaList from "@/components/CriteriaList";
 import FactCheckCard from "@/components/FactCheckCard";
 import CertificationPair from "@/components/CertificationPair";
 import Disclaimer from "@/components/Disclaimer";
+import Spinner from "@/components/Spinner";
+import { Calendar, ExternalLink, Info, Search } from "@/components/Icon";
+import styles from "@/components/ui.module.css";
 
-const STEPS = ["Extraction", "Recherche", "Dates", "Statut"];
+const STEPS = [
+  ["Lecture", "Le contenu est lu et transcrit."],
+  ["Recherche", "Les sources publiées sont rassemblées."],
+  ["Dates", "L'ancienneté des traces est établie."],
+  ["Statut", "Les critères sont comparés, puis le statut est proposé."],
+];
 
 export default function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
@@ -28,8 +37,8 @@ export default function AnalysisPage() {
       const res = await api<AnalysisDetail>(`/analyses/${id}/`, { auth: false });
       setData(res);
       const running = res.status === "pending" || res.status === "running";
-      // La recherche inversée d'image (Apify) arrive après le statut : on continue
-      // de rafraîchir quelques minutes pour l'afficher sans rechargement manuel.
+      // La recherche inversée d'image arrive après le statut : on continue
+      // de rafraîchir quelques minutes pour l'afficher sans rechargement.
       const enriching = Boolean(res.result?.extraction?.image_pending) && polls.current < 70;
       if (running || enriching) {
         polls.current += 1;
@@ -51,11 +60,12 @@ export default function AnalysisPage() {
 
   if (error) {
     return (
-      <div className="container">
+      <div className="container reading">
+        <p className="eyebrow">Dossier de vérification</p>
         <h1>Analyse indisponible</h1>
         <p className="error-text" role="alert">{error}</p>
         <p>
-          <a href="/">Revenir à l&apos;accueil pour lancer une analyse.</a>
+          <Link href="/" className="btn btn-primary">Lancer une nouvelle analyse</Link>
         </p>
       </div>
     );
@@ -63,126 +73,205 @@ export default function AnalysisPage() {
 
   if (!data || data.status === "pending" || data.status === "running") {
     return (
-      <div className="container">
-        <h1>Analyse en cours</h1>
-        <p className="mono">#{id}</p>
-        <ol aria-label="Étapes de l'analyse" style={{ paddingLeft: "var(--s-4)" }}>
-          {STEPS.map((s) => (
-            <li key={s} style={{ marginBottom: "var(--s-2)" }}>{s}</li>
-          ))}
-        </ol>
-        <p>
-          <span className="pulse" aria-hidden /> Vous pouvez fermer cette page. Les inscrits sont prévenus à la fin.
-        </p>
-        {slow && (
-          <p className="banner" role="status" style={{ marginTop: "var(--s-4)" }}>
-            Réveil du serveur en cours, cela peut prendre environ une minute.
+      <div className="container reading">
+        <div className={styles.pageHeader}>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 6 }}>Dossier de vérification</p>
+            <h1 style={{ margin: 0 }}>Analyse en cours</h1>
+          </div>
+          <span className={styles.dossierId}>#{id}</span>
+        </div>
+        <div className="card card-accent">
+          <div className="cluster" style={{ marginBottom: "var(--s-4)" }}>
+            <Spinner size={20} label="Recherche des sources" />
+            <strong style={{ fontSize: "var(--fs-sm)" }}>Recherche des sources et des antériorités…</strong>
+          </div>
+          <ol className="stack-sm" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {STEPS.map(([title, text], i) => (
+              <li key={title} className="cluster" style={{ alignItems: "flex-start", gap: "var(--s-3)" }}>
+                <span
+                  className="mono"
+                  style={{
+                    flex: "none",
+                    width: 24,
+                    height: 24,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 99,
+                    background: "var(--brand-100)",
+                    color: "var(--brand-700)",
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span>
+                  <strong style={{ fontSize: "var(--fs-sm)" }}>{title}</strong>
+                  <span className="muted" style={{ display: "block", fontSize: "var(--fs-xs)" }}>{text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="hint" style={{ marginTop: "var(--s-4)" }}>
+            Cette page se met à jour toute seule. Vous pouvez la fermer : le lien reste valable,
+            et les inscrits sont prévenus à la fin.
           </p>
-        )}
+          {slow && (
+            <p className="banner" role="status" style={{ marginTop: "var(--s-4)" }}>
+              La préparation prend un peu plus de temps que d&apos;habitude. Merci de patienter.
+            </p>
+          )}
+        </div>
       </div>
     );
   }
 
   const r = data.result;
+  const created = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(r.created_at));
+
   return (
     <div className="container">
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--s-4)", flexWrap: "wrap", alignItems: "baseline" }}>
-        <h1>Résultat de l&apos;analyse</h1>
-        <span className="mono" style={{ fontSize: "var(--fs-sm)" }}>#{r.public_id}</span>
+      <div className={styles.pageHeader}>
+        <div>
+          <p className="eyebrow" style={{ marginBottom: 6 }}>Dossier de vérification</p>
+          <h1 style={{ margin: 0 }}>Résultat de l&apos;analyse</h1>
+        </div>
+        <span className={styles.dossierId}>#{r.public_id}</span>
       </div>
 
       <MissingModules missing={r.missing} />
-      <div style={{ marginTop: "var(--s-4)" }}>
-        <StatusCard result={r} />
-        <NatureTag result={r} />
-      </div>
 
-      {r.extraction?.image_pending && (
-        <p className="banner" role="status" style={{ marginTop: "var(--s-4)" }}>
-          Recherche inversée d&apos;image en cours : les correspondances visuelles apparaîtront ici automatiquement.
-        </p>
-      )}
+      <StatusCard result={r} />
+      <NatureTag result={r} />
 
-      {r.extraction?.ocr_text && (
-        <section className="card" style={{ marginTop: "var(--s-4)" }} aria-labelledby="ocr-titre">
-          <h3 id="ocr-titre" style={{ fontSize: "var(--fs-md)" }}>Texte lu dans l&apos;image</h3>
-          <p className="mono" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-            {r.extraction.ocr_text}
-          </p>
-          {r.extraction.ocr_engine && (
-            <p style={{ marginTop: "var(--s-2)", fontSize: "var(--fs-sm)", color: "var(--ink-muted)" }}>
-              Moteur de lecture : {r.extraction.ocr_engine}
+      <div className={styles.analysisGrid} style={{ marginTop: "var(--s-6)" }}>
+        <div className="stack">
+          {r.extraction?.image_pending && (
+            <p className="banner banner-info" role="status">
+              <Info size={17} style={{ flex: "none", marginTop: 2 }} />
+              <span>La recherche de cette image sur le web se poursuit. Les correspondances apparaîtront ici automatiquement.</span>
             </p>
           )}
-        </section>
-      )}
 
-      {r.extraction && (r.extraction.title || r.extraction.author || (r.extraction.keywords && r.extraction.keywords.length > 0)) && (
-        <section className="card" style={{ marginTop: "var(--s-4)" }} aria-labelledby="extraction-titre">
-          <h3 id="extraction-titre" style={{ fontSize: "var(--fs-md)" }}>Éléments extraits</h3>
-          {r.extraction.title && <p style={{ marginBottom: "var(--s-2)" }}><strong>Titre :</strong> {r.extraction.title}</p>}
-          {r.extraction.author && <p style={{ marginBottom: "var(--s-2)" }}><strong>Auteur :</strong> {r.extraction.author}</p>}
-          {r.extraction.date && (
-            <p style={{ marginBottom: "var(--s-2)" }}>
-              <strong>Date déclarée :</strong>{" "}
-              {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(r.extraction.date))}
+          {r.extraction?.ocr_text && (
+            <section className="card" aria-labelledby="ocr-titre">
+              <h2 id="ocr-titre" className="sectionTitle">Texte lu dans l&apos;image</h2>
+              <p className="mono" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", margin: 0 }}>
+                {r.extraction.ocr_text}
+              </p>
+            </section>
+          )}
+
+          {r.extraction &&
+            (r.extraction.title ||
+              r.extraction.author ||
+              r.extraction.date ||
+              (r.extraction.keywords && r.extraction.keywords.length > 0)) && (
+              <section className="card" aria-labelledby="extraction-titre">
+                <h2 id="extraction-titre" className="sectionTitle">Éléments identifiés</h2>
+                <dl className="stack-sm" style={{ margin: 0 }}>
+                  {r.extraction.title && (
+                    <div>
+                      <dt className="hint">Titre</dt>
+                      <dd style={{ margin: 0, fontWeight: 600 }}>{r.extraction.title}</dd>
+                    </div>
+                  )}
+                  {r.extraction.author && (
+                    <div>
+                      <dt className="hint">Auteur déclaré</dt>
+                      <dd style={{ margin: 0 }}>{r.extraction.author}</dd>
+                    </div>
+                  )}
+                  {r.extraction.date && (
+                    <div>
+                      <dt className="hint">Date annoncée</dt>
+                      <dd style={{ margin: 0 }}>
+                        <span className="cluster" style={{ gap: 6 }}>
+                          <Calendar size={14} />
+                          {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(r.extraction.date))}
+                        </span>
+                      </dd>
+                    </div>
+                  )}
+                  {r.extraction.keywords && r.extraction.keywords.length > 0 && (
+                    <div>
+                      <dt className="hint">Mots-clés</dt>
+                      <dd style={{ margin: 0, display: "flex", flexWrap: "wrap", gap: 6 }}>
+                        {r.extraction.keywords.map((k, i) => (
+                          <span key={i} className="pill">{k}</span>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </section>
+            )}
+
+          {r.extraction?.image_tools && r.extraction.image_tools.length > 0 && (
+            <section className="card" aria-labelledby="outils-image-titre">
+              <h2 id="outils-image-titre" className="sectionTitle">
+                <Search size={18} /> Poursuivre la recherche d&apos;image
+              </h2>
+              <p className="hint" style={{ marginBottom: "var(--s-3)" }}>
+                La date de première apparition n&apos;a pas pu être établie automatiquement.
+                Vous pouvez lancer la recherche vous-même :
+              </p>
+              <div className="cluster">
+                {r.extraction.image_tools.map((t, i) => (
+                  <a key={i} className="btn btn-secondary" href={t.link} target="_blank" rel="noopener noreferrer">
+                    {t.title} <ExternalLink size={14} />
+                    <span className="sr-only">(s&apos;ouvre dans un nouvel onglet)</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section aria-labelledby="sources-titre">
+            <h2 id="sources-titre" className="sectionTitle">Sources retrouvées</h2>
+            <SourceTimeline sources={r.sources} />
+          </section>
+
+          <section aria-labelledby="factchecks-titre">
+            <h2 id="factchecks-titre" className="sectionTitle">Vérifications déjà publiées</h2>
+            <FactCheckCard items={r.factchecks} />
+          </section>
+
+          <section aria-labelledby="certifications-titre">
+            <h2 id="certifications-titre" className="sectionTitle">Lectures des insiders</h2>
+            <CertificationPair certifications={r.certifications} />
+          </section>
+
+          <CriteriaList criteria={r.criteria} />
+        </div>
+
+        <aside className={styles.analysisAside}>
+          <div className="card card-flat stack-sm">
+            <p className="eyebrow" style={{ margin: 0 }}>Repères</p>
+            <p style={{ margin: 0, fontSize: "var(--fs-sm)" }}>
+              <strong>Comment lire ce dossier</strong>
             </p>
-          )}
-          {r.extraction.keywords && r.extraction.keywords.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--s-2)" }}>
-              {r.extraction.keywords.map((k, i) => (
-                <span key={i} className="pill">{k}</span>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {r.extraction?.image_tools && r.extraction.image_tools.length > 0 && (
-        <section aria-labelledby="outils-image-titre">
-          <h2 id="outils-image-titre" className="sectionTitle">Recherche inversée d'image</h2>
-          <p style={{ color: "var(--ink-muted)", fontSize: "var(--fs-sm)" }}>
-            Date de première apparition indisponible. Vous pouvez lancer la recherche vous-même :
-          </p>
-          <div style={{ display: "flex", gap: "var(--s-2)", flexWrap: "wrap" }}>
-            {r.extraction.image_tools.map((t, i) => (
-              <a key={i} className="btn btn-secondary" href={t.link} target="_blank" rel="noopener noreferrer">
-                {t.title}
-                <span className="sr-only">(s&apos;ouvre dans un nouvel onglet)</span>
-              </a>
-            ))}
+            <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "var(--fs-xs)", color: "var(--ink-muted)" }}>
+              <li>Le statut décrit l&apos;information, jamais une personne.</li>
+              <li>Une source unique ne suffit pas à corroborer un fait.</li>
+              <li>Une absence de source ne prouve pas qu&apos;un fait est faux.</li>
+            </ul>
+            <p className="hint" style={{ margin: 0 }}>Dossier ouvert le {created}.</p>
+            <Link href="/comment-ca-marche" className="btn btn-secondary" style={{ marginTop: "var(--s-2)" }}>
+              Comprendre la méthode
+            </Link>
           </div>
-        </section>
-      )}
-
-      <section aria-labelledby="sources-titre">
-        <h2 id="sources-titre" className="sectionTitle">Sources</h2>
-        <SourceTimeline sources={r.sources} />
-      </section>
-
-      <section aria-labelledby="factchecks-titre">
-        <h2 id="factchecks-titre" className="sectionTitle">Vérifications de faits publiées</h2>
-        <FactCheckCard items={r.factchecks} />
-      </section>
-
-      <section aria-labelledby="certifications-titre">
-        <h2 id="certifications-titre" className="sectionTitle">Certifications des insiders</h2>
-        <CertificationPair certifications={r.certifications} />
-      </section>
-
-      <section aria-labelledby="criteres-section">
-        <h2 id="criteres-section" className="sectionTitle">Critères</h2>
-        <CriteriaList criteria={r.criteria} />
-      </section>
-
-      <div style={{ marginTop: "var(--s-8)" }}>
-        <Disclaimer />
+          <div style={{ marginTop: "var(--s-3)" }}>
+            <Disclaimer />
+          </div>
+          <p className="hint" style={{ marginTop: "var(--s-3)" }}>
+            Ce lien est visible par toute personne qui le possède.{" "}
+            <Link href="/limites">Signaler une erreur</Link>
+          </p>
+        </aside>
       </div>
-
-      <p style={{ marginTop: "var(--s-4)", fontSize: "var(--fs-sm)", color: "var(--ink-muted)" }}>
-        Ce lien est visible par toute personne qui le possède.{" "}
-        <a href="/limites">Signaler une erreur</a>
-      </p>
     </div>
   );
 }

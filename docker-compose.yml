@@ -37,7 +37,7 @@ services:
       args:
         # URL que le NAVIGATEUR appelle : doit être joignable depuis le téléphone.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Plateforme anti-fake news}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-InfoxVerify}
     environment:
       # Lues à chaque requête par /runtime-config.js (changer sans rebuild).
       API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}

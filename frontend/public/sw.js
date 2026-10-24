@@ -1,15 +1,9 @@
-// Cache du shell uniquement : les navigations passent toujours par le réseau
-// pour ne jamais servir une page HTML d'un déploiement précédent.
-const CACHE = "antifake-v3";
-const SHELL = ["/", "/manifest.webmanifest"];
+const CACHE = "antifake-v5";
+const DEV_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
+const SHELL = ["/manifest.webmanifest", "/brand/mark.svg", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((c) => c.addAll(SHELL))
-      .then(() => self.skipWaiting()),
-  );
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -22,39 +16,47 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  // Navigations : réseau d'abord, cache seulement hors ligne.
-  if (event.request.mode === "navigate") {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  // En développement, les fichiers Next ne sont pas empreintés : aucun cache,
+  // sinon une ancienne version du code peut être servie indéfiniment.
+  if (DEV_HOSTS.includes(self.location.hostname)) return;
+  // Ne jamais intercepter les appels d'API ni le fichier de configuration runtime.
+  if (url.pathname.startsWith("/api/") || url.pathname === "/runtime-config.js") return;
+
+  // Pages : le réseau fait foi, pour qu'un nouveau déploiement soit visible tout de suite.
+  if (request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request)
-        .then((res) => {
-          if (res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(event.request, clone));
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then((c) => c.put(request, copy));
           }
-          return res;
+          return response;
         })
-        .catch(() => caches.match(event.request).then((hit) => hit || caches.match("/"))),
+        .catch(() =>
+          caches.match(request).then((hit) => hit || caches.match("/")),
+        ),
     );
     return;
   }
 
-  // Ressources : cache d'abord (leurs noms sont hachés par Next.js), réseau sinon.
+  // Ressources statiques (empreintes de build) : cache d'abord, mise à jour en arrière-plan.
   event.respondWith(
-    caches.match(event.request).then(
-      (hit) =>
-        hit ||
-        fetch(event.request).then((res) => {
-          if (res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(event.request, clone));
-          }
-          return res;
-        }),
-    ),
+    caches.match(request).then((hit) => {
+      if (hit) return hit;
+      return fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy));
+        }
+        return response;
+      });
+    }),
   );
 });
 
@@ -66,7 +68,7 @@ self.addEventListener("push", (event) => {
   } catch (error) {
     payload = { body: event.data ? event.data.text() : "" };
   }
-  const title = payload.title || "Plateforme anti-fake news";
+  const title = payload.title || "InfoxVerify";
   const options = {
     body: payload.body || "",
     icon: "/icons/icon-192.png",

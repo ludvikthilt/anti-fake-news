@@ -31,7 +31,7 @@ def send_email(to: str, subject: str, html: str) -> str:
         f"{BASE_URL}/smtp/email",
         headers=_headers(),
         json={
-            "sender": {"name": "Plateforme anti-fake news", "email": settings.EMAIL_FROM},
+            "sender": {"name": "InfoxVerify", "email": settings.EMAIL_FROM},
             "to": [{"email": to}],
             "subject": subject,
             "htmlContent": html,

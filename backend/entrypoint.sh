@@ -15,9 +15,13 @@ if [ "${CACHE_BACKEND:-locmem}" = "db" ]; then
     python manage.py createcachetable
 fi
 
-if [ -n "${DJANGO_SUPERUSER_EMAIL:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+if [ -n "${DJANGO_SUPERUSER_EMAIL:-}" ] || [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+    if [ -z "${DJANGO_SUPERUSER_EMAIL:-}" ] || [ -z "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+        echo "[entrée] DJANGO_SUPERUSER_EMAIL et DJANGO_SUPERUSER_PASSWORD doivent être définis ensemble" >&2
+        exit 1
+    fi
     echo "[entrée] compte administrateur"
-    python manage.py createsuperuser --noinput 2>/dev/null || echo "  (déjà existant)"
+    python manage.py ensure_superuser
 fi
 
 echo "[entrée] gunicorn"

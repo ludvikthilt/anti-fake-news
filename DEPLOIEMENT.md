@@ -47,7 +47,7 @@ Le fonctionnement local reste inchangé : `manage.py runserver` et `next dev`.
 | `LOG_LEVEL` | `INFO` | Verbosité des journaux. |
 | `GUNICORN_WORKERS` | `3` | Nombre de workers. |
 | `MAX_REQUEST_BYTES` | `12582912` | Taille maximale d'une requête (image 5 Mo en base64). |
-| `DJANGO_SUPERUSER_EMAIL` / `DJANGO_SUPERUSER_PASSWORD` | — | Création automatique du compte admin au premier démarrage. |
+| `DJANGO_SUPERUSER_EMAIL` / `DJANGO_SUPERUSER_PASSWORD` | — | Création et synchronisation du compte admin au démarrage. |
 
 ### Fournisseurs (aucune n'est obligatoire, les chaînes de repli prennent le relais)
 
@@ -113,8 +113,13 @@ les deux images Docker à partir du dépôt et fournit HTTPS automatiquement.
 trois ressources : `antifake-db`, `antifake-api`, `antifake-web`.
 3. Cliquer **Apply**. Le premier build prend quelques minutes ; `antifake-api` reste rouge tant que
    la base n'est pas prête, puis /api/health/ passe au vert.
-4. Renseigner les variables marquées `sync: false` sur `antifake-api` (clés Tavily, Gemini, Brevo,
-   Google, Telegram…). Render redéploie automatiquement à chaque enregistrement.
+4. Renseigner les variables marquées `sync: false` sur `antifake-api`, notamment
+   `DJANGO_SUPERUSER_PASSWORD` avec le mot de passe souhaité (ne pas le mettre dans `render.yaml`
+   ni dans le dépôt), ainsi que les clés Tavily, Gemini, Brevo, Google et Telegram. L'adresse
+   `DJANGO_SUPERUSER_EMAIL` est déjà configurée. Au démarrage, l'API crée ou met à jour ce
+   superutilisateur dans PostgreSQL avec les identifiants configurés. Render redéploie
+   automatiquement à chaque enregistrement. Le mot de passe de la variable est réappliqué à chaque
+   démarrage : modifiez cette variable dans Render si vous souhaitez changer le mot de passe.
 5. Vérifier les adresses : si Render a suffixé un nom (déjà pris), mettre à jour `ALLOWED_HOSTS`,
    `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `BACKEND_BASE_URL` et `API_URL`
    du front. `API_URL` est lue à l'exécution : un simple redémarrage suffit, sans rebuild.

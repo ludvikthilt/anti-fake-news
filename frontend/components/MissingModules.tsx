@@ -1,25 +1,25 @@
 import type { MissingService } from "@/lib/types";
-import { Alert } from "./Icon";
+import { Info } from "./Icon";
 import styles from "./ui.module.css";
 
+/**
+ * Analyse partielle : on informe sans exposer la mécanique interne
+ * (fournisseurs, erreurs d'API, moteurs OCR). L'utilisateur n'a besoin
+ * que de savoir ce qui reste fiable et ce qu'il peut faire.
+ */
 export default function MissingModules({ missing }: { missing: MissingService[] }) {
   if (!missing.length) return null;
   return (
     <div className={styles.missing} role="status">
-      <strong>
-        <Alert size={16} style={{ verticalAlign: "-3px", marginRight: 6 }} />
-        Analyse partielle — certains modules sont indisponibles.
-      </strong>
-      <ul className={styles.missingList}>
-        {missing.map((m, i) => (
-          <li key={i}>
-            {m.service} : {m.reason || "service ne répond pas"}
-          </li>
-        ))}
-      </ul>
-      <p style={{ margin: "var(--s-2) 0 0", fontSize: "var(--fs-sm)" }}>
-        Le résultat affiché ci-dessous reste valable avec les éléments disponibles.
-      </p>
+      <Info size={20} className={styles.missingIcon} />
+      <div>
+        <strong className={styles.missingTitle}>Certains éléments n&apos;ont pas pu être vérifiés</strong>
+        <p>
+          Nous n&apos;avons pas pu réunir toutes les pièces pour cette information. Le résultat
+          ci-dessous reste utilisable, mais il est incomplet : ouvrez les sources disponibles
+          avant de vous faire un avis.
+        </p>
+      </div>
     </div>
   );
 }

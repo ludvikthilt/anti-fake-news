@@ -1,38 +1,44 @@
 import type { CertificationRow } from "@/lib/types";
+import { ShieldCheck } from "./Icon";
 import styles from "./ui.module.css";
 
 export default function CertificationPair({ certifications }: { certifications: CertificationRow[] }) {
   if (!certifications.length) {
     return (
-      <p style={{ color: "var(--ink-muted)" }}>
-        Aucune certification d&apos;insider pour le moment.
-      </p>
+      <div className="card card-flat">
+        <p style={{ margin: 0, color: "var(--ink-muted)", fontSize: "var(--fs-sm)" }}>
+          Aucune certification d&apos;insider pour le moment. Une certification est une lecture
+          signée, datée et sourcée — pas un verdict.
+        </p>
+      </div>
     );
   }
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--s-3)" }}>
+    <div className="stack-sm">
       {certifications.map((c, i) => (
-        <article key={i} className="card">
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--s-2)" }}>
-            <span className={`pill ${c.verdict === "certify" ? "ok" : "warn"}`} style={{ fontSize: "var(--fs-xs)" }}>
+        <article key={i} className="card card-flat">
+          <div className="cluster">
+            <span className={`pill ${c.verdict === "certify" ? "ok" : "warn"}`}>
+              <ShieldCheck size={13} />
               {c.verdict === "certify" ? "Information certifiée" : "Information contestée"}
             </span>
+            <span className="muted" style={{ fontSize: "var(--fs-xs)" }}>
+              Par {c.insider || "un insider"}
+              {c.created_at
+                ? ` · ${new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(c.created_at))}`
+                : ""}
+            </span>
           </div>
-          {c.comment && <p style={{ fontSize: "var(--fs-sm)", marginTop: "var(--s-2)" }}>{c.comment}</p>}
-          <div style={{ display: "flex", gap: "var(--s-3)", flexWrap: "wrap", fontSize: "var(--fs-xs)", color: "var(--ink-muted)", marginTop: "var(--s-2)" }}>
-            <span>Par {c.insider || "un insider"}</span>
-            {c.created_at && (
-              <time dateTime={c.created_at}>
-                {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(c.created_at))}
-              </time>
-            )}
-            {c.source_url && (
+          {c.comment && (
+            <p style={{ margin: "var(--s-3) 0 0", fontSize: "var(--fs-sm)" }}>{c.comment}</p>
+          )}
+          {c.source_url && (
+            <p style={{ margin: "var(--s-2) 0 0", fontSize: "var(--fs-xs)" }}>
               <a href={c.source_url} target="_blank" rel="noopener noreferrer">
                 Source de la certification
-                <span className="sr-only">(s&apos;ouvre dans un nouvel onglet)</span>
               </a>
-            )}
-          </div>
+            </p>
+          )}
         </article>
       ))}
     </div>

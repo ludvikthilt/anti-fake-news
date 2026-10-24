@@ -160,5 +160,5 @@ def handle_update(update: dict) -> dict:
         stats["optout"] = 1
         _reply(chat_id, "Vous ne recevrez plus de messages. Envoyez /start avec un nouveau code pour réactiver.")
     elif command in {"/aide", "/help", "aide", "help"}:
-        _reply(chat_id, "Plateforme anti-fake news : analyses et campagnes d'éducation aux médias. Envoyez /stop pour vous désinscrire.")
+        _reply(chat_id, "InfoxVerify : analyses et campagnes d'éducation aux médias. Envoyez /stop pour vous désinscrire.")
     return stats

@@ -1,14 +1,30 @@
 {
-  "name": "Plateforme anti-fake news",
-  "short_name": "Anti-fake news",
+  "name": "InfoxVerify — aide à la vérification de l'information",
+  "short_name": "InfoxVerify",
   "description": "Ce site aide à vérifier : il ne prouve pas qu'une information est vraie.",
   "lang": "fr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#F5F9FC",
-  "theme_color": "#0B6A9E",
+  "theme_color": "#0E2A3B",
+  "categories": ["education", "news", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Analyser une information",
+      "short_name": "Analyser",
+      "url": "/",
+      "description": "Soumettre un texte, un lien ou une image à vérifier."
+    },
+    {
+      "name": "Wiki des insiders",
+      "short_name": "Wiki",
+      "url": "/wiki",
+      "description": "Consulter les fiches de référence."
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",

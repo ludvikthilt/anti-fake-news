@@ -27,6 +27,10 @@ services:
         value: "false"
       - key: DJANGO_SECRET_KEY
         generateValue: true
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: ludviktybho@gmail.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
       - key: ALLOWED_HOSTS
         value: antifake-api.onrender.com,.onrender.com
       - key: FRONTEND_URL
@@ -101,7 +105,7 @@ services:
       - key: API_URL
         value: https://antifake-api.onrender.com/api
       - key: NEXT_PUBLIC_APP_NAME
-        value: Plateforme anti-fake news
+        value: InfoxVerify
       # Identifiant OAuth public : lisible par tous, ce n'est pas un secret.
       - key: GOOGLE_CLIENT_ID
         value: 294321887889-6d0u6qekbvrhimj5940t090rtnu3rbcn.apps.googleusercontent.com

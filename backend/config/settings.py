@@ -1,4 +1,4 @@
-"""Configuration Django de la plateforme anti-fake news (MVP)."""
+"""Configuration Django d'InfoxVerify (MVP)."""
 import os
 from pathlib import Path
 
@@ -127,7 +127,7 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Plateforme anti-fake news — API",
+    "TITLE": "InfoxVerify — API",
     "VERSION": "1.1",
 }
 

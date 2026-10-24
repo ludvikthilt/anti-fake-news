@@ -21,7 +21,11 @@ export function apiBase(): string {
   return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || DEFAULT_API;
 }
 
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Plateforme anti-fake news";
+/** Nom du produit — identité fixe, indépendante de l'environnement de déploiement. */
+export const APP_NAME = "InfoxVerify";
+
+/** Base de l'API pour le rendu serveur (pages qui interrogent l'API côté serveur). */
+export const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || DEFAULT_API;
 
 const TOKEN_KEY = "antifake.access";
 const REFRESH_KEY = "antifake.refresh";

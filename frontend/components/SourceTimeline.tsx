@@ -12,8 +12,8 @@ const TYPE_LABELS: Record<string, string> = {
   unknown: "Site inconnu",
 };
 
-const SCORE_LEVEL = (score: number) =>
-  score >= 80 ? "Fiabilité élevée" : score >= 70 ? "Fiabilité moyenne" : "Fiabilité faible";
+const scoreLabel = (score: number) =>
+  score >= 80 ? "Fiabilité élevée" : score >= 70 ? "Fiabilité moyenne" : "Fiabilité à confirmer";
 
 function formatDate(iso: string | null) {
   if (!iso) return null;
@@ -27,9 +27,12 @@ function formatDate(iso: string | null) {
 export default function SourceTimeline({ sources }: { sources: SourceRow[] }) {
   if (!sources.length) {
     return (
-      <p style={{ color: "var(--ink-muted)" }}>
-        Aucune source trouvée. L&apos;analyse reste indéterminée, ce qui ne signifie ni « vrai » ni « faux ».
-      </p>
+      <div className="card card-flat">
+        <p style={{ margin: 0, color: "var(--ink-muted)", fontSize: "var(--fs-sm)" }}>
+          Aucune source exploitable n&apos;a été trouvée. L&apos;analyse reste indéterminée :
+          cela ne signifie ni « vrai » ni « faux ».
+        </p>
+      </div>
     );
   }
   return (
@@ -39,8 +42,9 @@ export default function SourceTimeline({ sources }: { sources: SourceRow[] }) {
         return (
           <li key={i} className={styles.timelineItem}>
             <div className={styles.timelineDomain}>
-              <span className="mono">{s.domain || "domaine inconnu"}</span>
+              <strong>{s.domain || "domaine inconnu"}</strong>
               <span className="pill">{TYPE_LABELS[s.type] || "Site inconnu"}</span>
+              <span className="pill" style={{ marginLeft: "auto" }}>{scoreLabel(s.score)}</span>
             </div>
             {s.title && <p className={styles.timelineTitle}>{s.title}</p>}
             <div className={styles.timelineMeta}>
@@ -52,10 +56,9 @@ export default function SourceTimeline({ sources }: { sources: SourceRow[] }) {
               ) : (
                 <span>Date de première apparition indisponible</span>
               )}
-              <span>{SCORE_LEVEL(s.score)}</span>
               {s.url && (
                 <a href={s.url} target="_blank" rel="noopener noreferrer">
-                  Ouvrir la source <ExternalLink size={14} />
+                  Ouvrir la source <ExternalLink size={13} />
                   <span className="sr-only">(s&apos;ouvre dans un nouvel onglet)</span>
                 </a>
               )}

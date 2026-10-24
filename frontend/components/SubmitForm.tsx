@@ -4,10 +4,14 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import type { AnalysisDetail } from "@/lib/types";
-import { FileText, ImageIcon, Link, Send } from "./Icon";
+import { Camera, Clipboard, FileText, ImageIcon, Link as LinkIcon, Lock, Send, X } from "./Icon";
+import Spinner from "./Spinner";
 import styles from "./ui.module.css";
 
 type Tab = "text" | "link" | "image";
+
+const MAX_TEXT = 5000;
+const MAX_IMG_BYTES = 5 * 1024 * 1024;
 
 export default function SubmitForm() {
   const router = useRouter();
@@ -19,20 +23,26 @@ export default function SubmitForm() {
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const MAX_TEXT = 5000;
-  const MAX_IMG_BYTES = 5 * 1024 * 1024;
+  async function paste() {
+    try {
+      const clip = await navigator.clipboard.readText();
+      if (clip) setText(clip.slice(0, MAX_TEXT));
+    } catch {
+      document.getElementById("input-text")?.focus();
+    }
+  }
 
   async function submit() {
     setError("");
     const body: Record<string, string> = { input_type: tab };
     if (tab === "text") {
-      if (!text.trim()) return setError("Veuillez saisir un texte à analyser.");
+      if (!text.trim()) return setError("Collez ou saisissez le texte à vérifier.");
       body.input_text = text;
     } else if (tab === "link") {
-      if (!url.trim()) return setError("Veuillez coller un lien.");
+      if (!url.trim()) return setError("Collez le lien de la publication à vérifier.");
       body.input_url = url;
     } else {
-      if (!image) return setError("Veuillez choisir une image.");
+      if (!image) return setError("Choisissez une capture d'écran à analyser.");
       body.image = image;
     }
     setSending(true);
@@ -51,17 +61,17 @@ export default function SubmitForm() {
     setError("");
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      return setError("Format non pris en charge : JPEG, PNG ou WebP uniquement.");
+      return setError("Formats acceptés : JPEG, PNG ou WebP.");
     }
     if (file.size > MAX_IMG_BYTES) {
-      return setError("Image trop lourde : 5 Mo maximum.");
+      return setError("Cette image dépasse 5 Mo. Réduisez-la avant de l'envoyer.");
     }
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
       if (img.width > 4096 || img.height > 4096) {
-        return setError("Image trop grande : 4 096 pixels maximum.");
+        return setError("Cette image dépasse 4 096 pixels de côté.");
       }
       const reader = new FileReader();
       reader.onload = () => setImage(String(reader.result));
@@ -72,83 +82,143 @@ export default function SubmitForm() {
 
   return (
     <div>
-      <div className={styles.tabs} role="tablist" aria-label="Type de contenu">
-        <button role="tab" aria-selected={tab === "text"} className={styles.tab} onClick={() => setTab("text")}>
+      <div className={styles.tabs} role="tablist" aria-label="Type de contenu à vérifier">
+        <button
+          role="tab"
+          type="button"
+          aria-selected={tab === "text"}
+          aria-controls="panneau-texte"
+          className={styles.tab}
+          onClick={() => setTab("text")}
+        >
           <FileText size={16} /> Texte
         </button>
-        <button role="tab" aria-selected={tab === "link"} className={styles.tab} onClick={() => setTab("link")}>
-          <Link size={16} /> Lien
+        <button
+          role="tab"
+          type="button"
+          aria-selected={tab === "link"}
+          aria-controls="panneau-lien"
+          className={styles.tab}
+          onClick={() => setTab("link")}
+        >
+          <LinkIcon size={16} /> Lien
         </button>
-        <button role="tab" aria-selected={tab === "image"} className={styles.tab} onClick={() => setTab("image")}>
+        <button
+          role="tab"
+          type="button"
+          aria-selected={tab === "image"}
+          aria-controls="panneau-image"
+          className={styles.tab}
+          onClick={() => setTab("image")}
+        >
           <ImageIcon size={16} /> Image
         </button>
       </div>
 
-      {tab === "text" && (
-        <div>
-          <label htmlFor="input-text" className="sr-only">Texte à analyser</label>
+      <div id="panneau-texte" role="tabpanel" hidden={tab !== "text"}>
+        <label htmlFor="input-text" className="sr-only">
+          Texte à analyser
+        </label>
+        <div className={styles.editor}>
           <textarea
             id="input-text"
             rows={5}
             maxLength={MAX_TEXT}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Collez ici l'information à vérifier…"
-            aria-describedby="text-count"
+            placeholder="Collez le message reçu par WhatsApp, SMS, ou copié sur Facebook…"
           />
-          <div className={styles.counter} id="text-count">
-            {text.length} / {MAX_TEXT}
+          <div className={styles.editorBar}>
+            <button type="button" className={styles.pasteBtn} onClick={paste}>
+              <Clipboard size={15} /> Coller le message
+            </button>
+            <span className={styles.counter} data-over={text.length > MAX_TEXT - 500} aria-live="polite">
+              {text.length.toLocaleString("fr-FR")} / {MAX_TEXT.toLocaleString("fr-FR")}
+            </span>
           </div>
         </div>
-      )}
+      </div>
 
-      {tab === "link" && (
-        <div>
-          <label htmlFor="input-url" className="sr-only">Lien à analyser</label>
+      <div id="panneau-lien" role="tabpanel" hidden={tab !== "link"}>
+        <label htmlFor="input-url" className="hint" style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>
+          Adresse de la publication ou de la page web
+        </label>
+        <div className={styles.editor}>
           <input
             id="input-url"
             type="url"
             inputMode="url"
-            className="mono"
+            autoComplete="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://…"
           />
         </div>
-      )}
+      </div>
 
-      {tab === "image" && (
-        <div>
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
+      <div id="panneau-image" role="tabpanel" hidden={tab !== "image"}>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          onChange={(e) => onFile(e.target.files?.[0])}
+        />
+        {image ? (
+          <div className="stack-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image} alt="Aperçu de la capture à analyser" className={styles.previewImg} />
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setImage("");
+                if (fileRef.current) fileRef.current.value = "";
+              }}
+            >
+              <X size={16} /> Changer d&apos;image
+            </button>
+          </div>
+        ) : (
           <button type="button" className={styles.dropzone} onClick={() => fileRef.current?.click()}>
-            {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt="Aperçu de l'image soumise" style={{ maxWidth: "100%", maxHeight: 220, borderRadius: "var(--radius-md)" }} />
-            ) : (
-              <>
-                <ImageIcon size={28} style={{ display: "block", margin: "0 auto" }} />
-                Glissez une image ici ou appuyez pour choisir un fichier.
-                <br />
-                <span style={{ fontSize: "var(--fs-xs)" }}>JPEG, PNG ou WebP · 5 Mo maximum · 4 096 px maximum</span>
-              </>
-            )}
+            <Camera size={30} style={{ color: "var(--brand-700)" }} />
+            <strong>Choisir une capture d&apos;écran</strong>
+            <span>Affiche, tract, photo ou publication partagée — JPEG, PNG ou WebP, 5 Mo maximum.</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
-      <p style={{ fontSize: "var(--fs-xs)", color: "var(--ink-muted)", marginTop: "var(--s-3)" }}>
-        Ne soumettez pas d&apos;informations personnelles ou confidentielles. Le contenu peut être transmis à des services externes.{" "}
-        <a href="/confidentialite">En savoir plus sur la confidentialité.</a>
-      </p>
-      <p style={{ fontSize: "var(--fs-xs)", color: "var(--ink-muted)" }}>
-        Les vidéos, audios et groupes fermés ne sont pas encore pris en charge : collez le texte ou l&apos;image à la main.
-      </p>
+      <div className={styles.audioNote}>
+        <span aria-hidden style={{ color: "var(--warn-bd)", fontWeight: 700 }}>♪</span>
+        <p>
+          <strong>Message audio reçu sur WhatsApp ?</strong>
+          La plateforme ne lit pas encore les fichiers vocaux : transcrivez les propos essentiels
+          ou joignez la capture des commentaires.
+        </p>
+      </div>
 
       {error && <p className="error-text" role="alert">{error}</p>}
 
-      <button className="btn btn-primary" onClick={submit} disabled={sending} style={{ width: "100%", marginTop: "var(--s-3)" }}>
-        <Send size={16} /> {sending ? "Lancement…" : "Analyser"}
+      <button type="button" className={`btn btn-primary ${styles.submitBtn}`} onClick={submit} disabled={sending}>
+        {sending ? (
+          <>
+            <Spinner size={17} label="Analyse en cours" /> Analyse en cours…
+          </>
+        ) : (
+          <>
+            <Send size={18} /> Analyser l&apos;information
+          </>
+        )}
       </button>
+
+      <p className={styles.privacyNote}>
+        <Lock size={13} style={{ marginTop: 1, flex: "none" }} />
+        <span>
+          Traitement anonymisé. Ne soumettez ni information personnelle ni contenu confidentiel.
+          Les images ne sont pas conservées après l&apos;analyse.{" "}
+          <a href="/confidentialite">Confidentialité</a>
+        </span>
+      </p>
     </div>
   );
 }
