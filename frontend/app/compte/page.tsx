@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, clearTokens, clearUser, getStoredUser, setStoredUser, setTokens } from "@/lib/api";
-import { GOOGLE_CLIENT_ID, startGoogleLogin } from "@/lib/google";
+import { googleClientId, startGoogleLogin } from "@/lib/google";
 import { disablePush, enablePush, pushSupported, type PushStatus } from "@/lib/push";
 import type { UserInfo } from "@/lib/types";
 import styles from "@/components/ui.module.css";
@@ -33,10 +33,14 @@ export default function ComptePage() {
   const [pushOn, setPushOn] = useState(false);
   const [pushMessage, setPushMessage] = useState("");
   const [pushError, setPushError] = useState("");
+  const [googleReady, setGoogleReady] = useState(false);
 
   useEffect(() => {
     const stored = getStoredUser();
     if (stored) setUser(stored as UserInfo);
+    // Le client OAuth est fourni par /runtime-config.js : on ne l'affiche
+    // qu'une fois la page hydratée, pour éviter tout écart de rendu.
+    setGoogleReady(Boolean(googleClientId()));
   }, []);
 
   useEffect(() => {
@@ -356,7 +360,7 @@ export default function ComptePage() {
         <button className="btn btn-primary" type="submit" disabled={busy} style={{ width: "100%" }}>
           {mode === "login" ? "Se connecter" : "Créer le compte"}
         </button>
-        {GOOGLE_CLIENT_ID && (
+        {googleReady && (
           <button
             type="button"
             className="btn btn-secondary"

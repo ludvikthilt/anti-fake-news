@@ -39,8 +39,9 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Plateforme anti-fake news}
     environment:
-      # Lue à chaque requête par /runtime-config.js (changer d'adresse sans rebuild).
+      # Lues à chaque requête par /runtime-config.js (changer sans rebuild).
       API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     restart: unless-stopped
     depends_on:
       - backend

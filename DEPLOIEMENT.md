@@ -118,8 +118,11 @@ trois ressources : `antifake-db`, `antifake-api`, `antifake-web`.
 5. Vérifier les adresses : si Render a suffixé un nom (déjà pris), mettre à jour `ALLOWED_HOSTS`,
    `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `BACKEND_BASE_URL` et `API_URL`
    du front. `API_URL` est lue à l'exécution : un simple redémarrage suffit, sans rebuild.
-6. Ajouter `https://<front>.onrender.com/compte/google/callback` dans la console Google, puis
-   redéclarer le webhook Telegram sur `https://<api>.onrender.com/api/webhooks/telegram/`.
+6. Ajouter `https://<front>.onrender.com` (origine) et
+   `https://<front>.onrender.com/compte/google/callback` dans la console Google. Le front lit
+   `GOOGLE_CLIENT_ID` et `API_URL` à l'exécution via `/runtime-config.js` : le blueprint fournit
+   déjà le client OAuth, et ces valeurs se changent sans reconstruire l'image.
+7. Redéclarer le webhook Telegram sur `https://<api>.onrender.com/api/webhooks/telegram/`.
 
 > **Offre gratuite** : les services s'endorment après une période d'inactivité (le premier appel
 > après réveil prend quelques dizaines de secondes) et le service PostgreSQL gratuit est limité

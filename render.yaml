@@ -102,3 +102,6 @@ services:
         value: https://antifake-api.onrender.com/api
       - key: NEXT_PUBLIC_APP_NAME
         value: Plateforme anti-fake news
+      # Identifiant OAuth public : lisible par tous, ce n'est pas un secret.
+      - key: GOOGLE_CLIENT_ID
+        value: 294321887889-6d0u6qekbvrhimj5940t090rtnu3rbcn.apps.googleusercontent.com
