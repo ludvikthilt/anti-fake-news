@@ -1,13 +1,23 @@
-const CACHE = "antifake-v2";
+// Cache du shell uniquement : les navigations passent toujours par le réseau
+// pour ne jamais servir une page HTML d'un déploiement précédent.
+const CACHE = "antifake-v3";
 const SHELL = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((c) => c.addAll(SHELL))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -15,19 +25,35 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Navigations : réseau d'abord, cache seulement hors ligne.
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => c.put(event.request, clone));
+          }
+          return res;
+        })
+        .catch(() => caches.match(event.request).then((hit) => hit || caches.match("/"))),
+    );
+    return;
+  }
+
+  // Ressources : cache d'abord (leurs noms sont hachés par Next.js), réseau sinon.
   event.respondWith(
     caches.match(event.request).then(
       (hit) =>
         hit ||
-        fetch(event.request)
-          .then((res) => {
-            if (res.ok && event.request.mode === "navigate") {
-              const clone = res.clone();
-              caches.open(CACHE).then((c) => c.put(event.request, clone));
-            }
-            return res;
-          })
-          .catch(() => caches.match("/")),
+        fetch(event.request).then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => c.put(event.request, clone));
+          }
+          return res;
+        }),
     ),
   );
 });
