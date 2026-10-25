@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from . import extraction, providers, reliability
 from .models import Analysis, Certification, FactCheck, MissingService, Source
+from .readings import certification_rows
 
 _semaphore = threading.Semaphore(2)
 logger = logging.getLogger(__name__)
@@ -59,6 +60,17 @@ def extract_link(url: str) -> str:
 
 def _score_for_type(source_type: str) -> int:
     return reliability.BASE_SCORE.get(source_type, 20)
+
+
+def _source_score(domain: str, source_type: str) -> int:
+    """Score d'une source : nature du site, fiche locale et reconnaissance automatique."""
+    from apps.knowledge import sites
+
+    base = _score_for_type(source_type)
+    if domain:
+        sites.remember_domain(domain, nature=source_type, score=base)
+        return sites.site_score(domain, base)
+    return base
 
 
 def _guess_type(domain: str, title: str) -> str:
@@ -133,13 +145,14 @@ def run_analysis(analysis_id):
         else:
             for item in image_result.get("items", []):
                 link = item.get("link") or ""
+                image_domain = providers.domain_of(link)
                 image_sources.append({
                     "url": link,
-                    "domain": providers.domain_of(link),
+                    "domain": image_domain,
                     "title": item.get("title", ""),
                     "excerpt": (item.get("snippet") or "")[:500],
                     "type": "unknown",
-                    "score": 20,
+                    "score": _source_score(image_domain, "unknown"),
                     "position": "neutral",
                     "date": None,
                     "date_origin": "indexation",
@@ -187,13 +200,14 @@ def run_analysis(analysis_id):
             url = item.get("link") or item.get("url") or ""
             title = item.get("title") or ""
             domain = providers.domain_of(url)
+            source_type = _guess_type(domain, title)
             sources.append({
                 "url": url,
                 "domain": domain,
                 "title": title,
                 "excerpt": (item.get("snippet") or item.get("content") or "")[:500],
-                "type": _guess_type(domain, title),
-                "score": _score_for_type(_guess_type(domain, title)),
+                "type": source_type,
+                "score": _source_score(domain, source_type),
                 "position": "neutral",
                 "date": None,
                 "date_origin": "",
@@ -227,24 +241,32 @@ def run_analysis(analysis_id):
                 src["date_origin"] = d.get("origin", "")
                 src["position"] = _position_for(src, query)
 
-    # --- Certifications existantes ---
-    certifications = list(
-        Certification.objects.filter(target_type=Certification.TargetType.ANALYSIS, target_id=str(analysis.id)).values(
-            "verdict", "comment", "source_url", "created_at", "user__email", "user__name"
+    # --- Reconnaissance des sites cités (fiche locale, certification affichée) ---
+    from apps.knowledge.models import SiteProfile
+    from apps.knowledge import sites
+
+    profiles = {
+        p.domain: p
+        for p in SiteProfile.objects.filter(
+            domain__in={s.get("domain") for s in sources if s.get("domain")}
         )
-    )
-    certifications = [
-        {
-            "verdict": c["verdict"],
-            "comment": c["comment"],
-            "source_url": c["source_url"],
-            "created_at": c["created_at"].isoformat() if c["created_at"] else None,
-            "insider": c["user__name"] or c["user__email"],
-        }
-        for c in certifications
-    ]
+    }
+    for src in sources:
+        profile = profiles.get(src.get("domain"))
+        src["certified"] = bool(profile and profile.certified)
+
+    # --- Lectures des insiders déjà déposées ---
+    certifications = certification_rows(Certification.TargetType.ANALYSIS, analysis.id)
 
     result = reliability.build_result(analysis, sources, factchecks, certifications, missing, meta)
+
+    # --- Corroboration constatée par le système : elle fait progresser les sites cités ---
+    if result["status"] == reliability.STATUS_OK:
+        reliable_domains = [s["domain"] for s in sources if (s.get("score") or 0) >= 70 and s.get("domain")]
+        try:
+            sites.record_corroborations(reliable_domains, analysis=analysis)
+        except Exception:  # noqa: BLE001 - la reconnaissance ne doit pas casser l'analyse
+            logger.exception("Reconnaissance des sites impossible pour l'analyse %s", analysis.id)
 
     # Persistance
     Source.objects.filter(analysis=analysis).delete()
@@ -395,6 +417,10 @@ def _search_local_base(query: str):
             continue
         profile = SiteProfile.objects.filter(domain=chunk.ref_id).first() if chunk.ref_type == "site" else None
         score = (_score_for_type(profile.nature) if profile else 20) + min(10, 4 * matched)
+        if profile and profile.certified:
+            from apps.knowledge import sites
+
+            score = min(score + sites.quota_bonus(), 98)
         rows.append({
             "url": chunk.url or "",
             "domain": providers.domain_of(chunk.url) if chunk.url else (profile.domain if profile else ""),

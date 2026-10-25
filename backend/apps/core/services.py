@@ -40,6 +40,10 @@ class QuotaService:
     def can_call(self, account: str, limit: int | None = None) -> bool:
         from .models import QuotaUsage
 
+        if limit is None:
+            # Plafond mensuel connu (dossier §6) : il est posé sur le compteur au
+            # premier appel, pour que l'administration affiche un reste réel.
+            limit = getattr(settings, "QUOTA_LIMITS", {}).get(account, 0)
         now = date.today()
         obj, _ = QuotaUsage.objects.get_or_create(account=account, period=now.strftime("%Y-%m"))
         if limit is not None and obj.limit != limit:

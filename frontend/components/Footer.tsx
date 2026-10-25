@@ -33,6 +33,7 @@ export default function Footer() {
               <Link href="/">Analyser une information</Link>
               <Link href="/comment-ca-marche">La méthode et les statuts</Link>
               <Link href="/wiki">Wiki des insiders</Link>
+              <Link href="/sites">Sites de référence</Link>
               <Link href="/historique">Mon historique</Link>
             </div>
           </nav>

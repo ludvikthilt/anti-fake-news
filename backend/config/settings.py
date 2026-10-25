@@ -177,6 +177,30 @@ CACHE_TTL_TEXT_HOURS = int(os.environ.get("CACHE_TTL_TEXT_HOURS", "6"))
 CACHE_TTL_IMAGE_HOURS = int(os.environ.get("CACHE_TTL_IMAGE_HOURS", "24"))
 # Seuil d'alerte des quotas fournisseurs (journal + AuditLog, une fois par mois).
 QUOTA_ALERT_RATIO = float(os.environ.get("QUOTA_ALERT_RATIO", "0.8"))
+# Plafonds mensuels par compte fournisseur (dossier §6 : pool de quotas).
+# 0 = pas de plafond connu ; surchargeable par QUOTA_LIMIT_<COMPTE>.
+def _quota(account: str, default: int) -> int:
+    return int(os.environ.get(f"QUOTA_LIMIT_{account.upper()}", str(default)))
+
+
+# Reconnaissance automatique d'un site fiable (aucune lecture isolée ne suffit) :
+# corroborations constatées par le système + insiders distincts qui le certifient.
+SITE_SYSTEM_QUOTA = int(os.environ.get("SITE_SYSTEM_QUOTA", "5"))
+SITE_INSIDER_QUOTA = int(os.environ.get("SITE_INSIDER_QUOTA", "3"))
+SITE_CERTIFY_BONUS = int(os.environ.get("SITE_CERTIFY_BONUS", "10"))
+
+QUOTA_LIMITS = {
+    "tavily": _quota("tavily", 1000),
+    "serper": _quota("serper", 2500),
+    "serpapi": _quota("serpapi", 100),
+    "searchapi": _quota("searchapi", 100),
+    "exa": _quota("exa", 1000),
+    "factcheck": _quota("factcheck", 0),
+    "ocrspace": _quota("ocrspace", 25000),
+    "apify_lens": _quota("apify_lens", 0),
+    "groq": _quota("groq", 0),
+    "gemini": _quota("gemini", 0),
+}
 # Part minimale des mots d'une vérification de faits retrouvés dans la demande.
 # En dessous, la vérification porte sur une autre affirmation : elle n'est pas retenue.
 FACTCHECK_MIN_COVERAGE = float(os.environ.get("FACTCHECK_MIN_COVERAGE", "0.5"))

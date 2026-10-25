@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { APP_NAME } from "@/lib/api";
+import { APP_NAME, getStoredUser } from "@/lib/api";
 import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
-import { Download, MessageCircle, Moon, MoreHorizontal, Scale, Shield, Sun, User, X } from "./Icon";
+import { Download, Link as LinkIcon, MessageCircle, Moon, MoreHorizontal, Scale, Shield, ShieldCheck, Sun, User, X } from "./Icon";
 import BrandMark from "./Logo";
 import styles from "./ui.module.css";
 
@@ -18,6 +18,7 @@ const LINKS = [
 
 const SHORTCUTS = [
   { href: "/comment-ca-marche", label: "La méthode et les statuts", Icon: Scale },
+  { href: "/sites", label: "Sites de référence", Icon: LinkIcon },
   { href: "/limites", label: "Limites & transparence", Icon: Shield },
   { href: "/insider/demande", label: "Devenir insider", Icon: User },
 ];
@@ -29,6 +30,7 @@ type InstallPrompt = Event & {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [isInsider, setIsInsider] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
   const [installed, setInstalled] = useState(false);
   const [installHint, setInstallHint] = useState("");
@@ -39,6 +41,17 @@ export default function Header() {
 
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);
+
+  // L'entrée « Insider » n'apparaît que pour les contributeurs validés.
+  const links = isInsider ? [...LINKS, { href: "/insider", label: "Insider" }] : LINKS;
+  const shortcuts = isInsider
+    ? [{ href: "/insider", label: "Espace insider", Icon: ShieldCheck }, ...SHORTCUTS]
+    : SHORTCUTS;
+
+  useEffect(() => {
+    const role = getStoredUser()?.role;
+    setIsInsider(role === "insider" || role === "admin");
+  }, [path]);
 
   // Le menu se referme dès qu'on change de page.
   useEffect(() => {
@@ -144,7 +157,7 @@ export default function Header() {
         </Link>
 
         <nav className={styles.nav} aria-label="Navigation principale">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -235,7 +248,7 @@ export default function Header() {
               {themeAction}
             </button>
 
-            {SHORTCUTS.map(({ href, label, Icon }) => (
+            {shortcuts.map(({ href, label, Icon }) => (
               <Link key={href} href={href} className={styles.menuItem} data-active={isActive(href)}>
                 <span className={styles.menuItemIcon} aria-hidden>
                   <Icon size={16} />

@@ -19,6 +19,25 @@ export interface SourceRow {
   date: string | null;
   date_origin: string;
   found_by: string;
+  certified?: boolean;
+}
+
+export interface SiteProfile {
+  domain: string;
+  name: string;
+  nature: string;
+  score: number;
+  description: string;
+  certified: boolean;
+  certified_at: string | null;
+  system_validations: number;
+  system_quota: number;
+  system_remaining: number;
+  insider_certifications: number;
+  insider_contests: number;
+  insider_net: number;
+  insider_quota: number;
+  insider_remaining: number;
 }
 
 export interface FactCheckRow {
@@ -30,11 +49,16 @@ export interface FactCheckRow {
   contradicts: boolean;
 }
 
+export type InsiderReviewStatus = "pending" | "approved" | "rejected";
+
 export interface CertificationRow {
-  verdict: string;
+  id?: number;
+  verdict: "certify" | "contest" | string;
+  proposed_status?: StatusKey | "";
   comment: string;
   source_url: string;
   created_at: string | null;
+  updated_at?: string | null;
   insider: string;
 }
 
@@ -97,6 +121,8 @@ export interface UserInfo {
 export interface WikiListItem {
   slug: string;
   title: string;
+  review_status: InsiderReviewStatus;
+  published: boolean;
   updated_at: string;
 }
 
@@ -105,6 +131,51 @@ export interface WikiDetail {
   title: string;
   content: string;
   published: boolean;
+  review_status: InsiderReviewStatus;
+  review_note: string;
   author_name: string;
+  author_email?: string;
+  created_at?: string;
   updated_at: string;
+}
+
+export interface InsiderReading {
+  id: number;
+  target_type: "analysis" | "site";
+  target_id: string;
+  verdict: "certify" | "contest";
+  proposed_status: StatusKey | "";
+  comment: string;
+  source_url: string;
+  insider: string;
+  target_label: string;
+  target_url: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface InsiderWikiPage {
+  slug: string;
+  title: string;
+  review_status: InsiderReviewStatus;
+  review_note: string;
+  published: boolean;
+  updated_at: string | null;
+}
+
+export interface InsiderQueueItem {
+  public_id: string;
+  status: StatusKey;
+  status_label: string;
+  input_type: string;
+  excerpt: string;
+  created_at: string;
+}
+
+export interface InsiderWorkspace {
+  role: string;
+  readings: InsiderReading[];
+  wiki_pages: InsiderWikiPage[];
+  to_review: InsiderQueueItem[];
+  counts: { readings: number; pending_wiki: number; to_review: number };
 }

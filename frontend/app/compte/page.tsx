@@ -54,7 +54,16 @@ export default function ComptePage() {
 
   useEffect(() => {
     const stored = getStoredUser();
-    if (stored) setUser(stored as UserInfo);
+    if (stored) {
+      setUser(stored as UserInfo);
+      // Le rôle peut avoir changé côté serveur (demande insider acceptée) : on le rafraîchit.
+      api<UserInfo>("/auth/me/")
+        .then((fresh) => {
+          setUser(fresh);
+          setStoredUser(fresh);
+        })
+        .catch(() => {});
+    }
     setGoogleReady(Boolean(googleClientId()));
   }, []);
 
@@ -210,6 +219,7 @@ export default function ComptePage() {
             <span className="cluster">
               <Link href="/historique" className="btn btn-secondary">Mon historique</Link>
               {user.role === "user" && <Link href="/insider/demande" className="btn btn-secondary">Devenir insider</Link>}
+              {user.role !== "user" && <Link href="/insider" className="btn btn-secondary">Espace insider</Link>}
               {user.role === "admin" && <Link href="/admin" className="btn btn-secondary">Administration</Link>}
               {user.role === "insider" && <Link href="/wiki" className="btn btn-secondary">Wiki</Link>}
             </span>

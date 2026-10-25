@@ -227,3 +227,37 @@ def _anteriority_phrase(sources):
 
 def certify_certs_count(certifications):
     return sum(1 for c in certifications if c["verdict"] == "certify")
+
+
+def refresh_analysis_status(analysis, certifications):
+    """Recalcule le statut quand une lecture d'insider est ajoutée, modifiée ou retirée.
+
+    Le dossier §12 place les certifications des insiders parmi les entrées du statut :
+    une information contestée sans désaccord devient « Contredite », un désaccord
+    entre insiders laisse « Indéterminée ». On met à jour le résultat en place pour
+    que le dossier reflète la lecture la plus récente, sans relancer l'analyse.
+    """
+    result = dict(analysis.result or {})
+    if not result:
+        return None
+
+    missing = result.get("missing", [])
+    missing_essential = any(
+        m.get("service") in {"recherche de texte", "recherche d'image"} for m in missing
+    )
+    status_key = compute_status(
+        result.get("sources", []), result.get("factchecks", []), certifications, missing_essential
+    )
+
+    result["status"] = status_key
+    result["status_label"] = STATUS_LABELS[status_key]
+    result["status_phrase"] = STATUS_PHRASES[status_key]
+    result["certifications"] = certifications
+    for criterion in result.get("criteria", []):
+        if criterion.get("key") == "certifications":
+            criterion["value"] = f"{len(certifications)} avis (certifie/conteste)"
+            criterion["ok"] = bool(certify_certs_count(certifications))
+
+    analysis.result = result
+    analysis.save(update_fields=["result", "updated_at"])
+    return status_key

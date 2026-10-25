@@ -44,6 +44,11 @@ export default function SourceTimeline({ sources }: { sources: SourceRow[] }) {
             <div className={styles.timelineDomain}>
               <strong>{s.domain || "domaine inconnu"}</strong>
               <span className="pill">{TYPE_LABELS[s.type] || "Site inconnu"}</span>
+              {s.certified && (
+                <span className="pill ok" title="Site reconnu par les corroborations du système et plusieurs insiders">
+                  Site certifié
+                </span>
+              )}
               <span className="pill" style={{ marginLeft: "auto" }}>{scoreLabel(s.score)}</span>
             </div>
             {s.title && <p className={styles.timelineTitle}>{s.title}</p>}

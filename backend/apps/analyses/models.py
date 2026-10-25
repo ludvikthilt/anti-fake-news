@@ -95,6 +95,13 @@ class FactCheck(models.Model):
 
 
 class Certification(models.Model):
+    """Lecture d'insider : certifie ou conteste une information (ou un site).
+
+    Le statut proposé reprend le vocabulaire des quatre statuts de la plateforme.
+    Une lecture est signée (auteur), datée et sourcée ; un insider ne peut avoir
+    qu'une lecture par cible, qu'il peut modifier ou retirer.
+    """
+
     class TargetType(models.TextChoices):
         ANALYSIS = "analysis", "Information"
         SITE = "site", "Site"
@@ -103,13 +110,24 @@ class Certification(models.Model):
         CERTIFY = "certify", "Certifie"
         CONTEST = "contest", "Conteste"
 
+    class ProposedStatus(models.TextChoices):
+        CORROBOREE = "corroboree", "Corroborée"
+        NON_CORROBOREE = "non_corroboree", "Non corroborée"
+        CONTREDITE = "contredite", "Contredite"
+        INDETERMINEE = "indeterminee", "Indéterminée"
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="certifications")
     target_type = models.CharField(max_length=16, choices=TargetType.choices)
     target_id = models.CharField(max_length=64)
     verdict = models.CharField(max_length=16, choices=Verdict.choices)
+    proposed_status = models.CharField(max_length=20, choices=ProposedStatus.choices, blank=True)
     comment = models.TextField(blank=True)
     source_url = models.URLField(max_length=1000, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["created_at"]
 
     def __str__(self):
         return f"{self.user.email} {self.verdict} {self.target_type}"

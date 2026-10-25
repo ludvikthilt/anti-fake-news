@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import type { AnalysisDetail } from "@/lib/types";
+import type { AnalysisDetail, CertificationRow } from "@/lib/types";
 import StatusCard from "@/components/StatusCard";
 import NatureTag from "@/components/NatureTag";
 import MissingModules from "@/components/MissingModules";
@@ -12,6 +12,7 @@ import SourceTimeline from "@/components/SourceTimeline";
 import CriteriaList from "@/components/CriteriaList";
 import FactCheckCard from "@/components/FactCheckCard";
 import CertificationPair from "@/components/CertificationPair";
+import InsiderReading from "@/components/InsiderReading";
 import Disclaimer from "@/components/Disclaimer";
 import Spinner from "@/components/Spinner";
 import { Calendar, ExternalLink, Info, Search } from "@/components/Icon";
@@ -27,7 +28,9 @@ const STEPS = [
 export default function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<AnalysisDetail | null>(null);
+  const [readings, setReadings] = useState<CertificationRow[] | null>(null);
   const [error, setError] = useState("");
+  const [readingError, setReadingError] = useState("");
   const [slow, setSlow] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const polls = useRef(0);
@@ -48,6 +51,39 @@ export default function AnalysisPage() {
       setError(e instanceof Error ? e.message : "Analyse introuvable.");
     }
   }, [id]);
+
+  const loadReadings = useCallback(async () => {
+    if (!data || data.status === "pending" || data.status === "running") return;
+    try {
+      const rows = await api<CertificationRow[]>(
+        `/certifications/?target_type=analysis&target_id=${data.id}`,
+        { auth: false },
+      );
+      setReadings(rows);
+    } catch {
+      // Le dossier reste lisible : on garde les lectures enregistrées dans le résultat.
+    }
+  }, [data]);
+
+  useEffect(() => {
+    loadReadings();
+  }, [loadReadings]);
+
+  async function refreshAfterReading() {
+    // Une lecture peut changer le statut proposé : on relit le dossier et les lectures.
+    await Promise.all([load(), loadReadings()]);
+  }
+
+  async function retractReading(id: number) {
+    if (!window.confirm("Retirer cette lecture ? Elle disparaîtra du dossier.")) return;
+    setReadingError("");
+    try {
+      await api(`/certifications/${id}/`, { method: "DELETE" });
+      await refreshAfterReading();
+    } catch (err) {
+      setReadingError(err instanceof Error ? err.message : "Le retrait n'a pas abouti.");
+    }
+  }
 
   useEffect(() => {
     load();
@@ -241,7 +277,22 @@ export default function AnalysisPage() {
 
           <section aria-labelledby="certifications-titre">
             <h2 id="certifications-titre" className="sectionTitle">Lectures des insiders</h2>
-            <CertificationPair certifications={r.certifications} />
+            {readingError && (
+              <p className="error-text" role="alert" style={{ marginBottom: "var(--s-3)" }}>
+                {readingError}
+              </p>
+            )}
+            <CertificationPair
+              certifications={readings ?? r.certifications}
+              onRetract={retractReading}
+            />
+            <div style={{ marginTop: "var(--s-4)" }}>
+              <InsiderReading
+                targetId={data.id}
+                readings={readings ?? r.certifications}
+                onChanged={refreshAfterReading}
+              />
+            </div>
           </section>
 
           <CriteriaList criteria={r.criteria} />

@@ -103,23 +103,201 @@ class AnalysisDetailView(APIView):
         return Response(status=204)
 
 
+def _resolve_target(target_type: str, raw_id: str):
+    """Retrouve la cible d'une lecture : dossier (UUID ou identifiant court) ou site."""
+    from django.core.exceptions import ValidationError as DjangoValidationError
+
+    from apps.knowledge.models import SiteProfile
+
+    raw = (raw_id or "").strip()
+    if not raw:
+        return None
+    if target_type == Certification.TargetType.SITE:
+        return SiteProfile.objects.filter(domain=raw.lower()).first()
+    analysis = Analysis.objects.filter(public_id=raw).first()
+    if analysis:
+        return analysis
+    try:
+        return Analysis.objects.filter(id=raw).first()
+    except (DjangoValidationError, ValueError):
+        return None
+
+
 class CertificationView(APIView):
-    permission_classes = [IsAuthenticated]
+    """M8 — les insiders certifient ou contestent une information, avec une source."""
+
     throttle_classes = [CertificationThrottle]
 
     def get(self, request):
-        target_type = request.query_params.get("target_type", "analysis")
+        target_type = request.query_params.get("target_type", Certification.TargetType.ANALYSIS)
         target_id = request.query_params.get("target_id", "")
-        qs = Certification.objects.filter(target_type=target_type, target_id=target_id)
+        if target_type not in Certification.TargetType.values:
+            return Response({"detail": "Type de cible inconnu."}, status=400)
+        qs = Certification.objects.filter(target_type=target_type, target_id=str(target_id))
         return Response(CertificationSerializer(qs, many=True).data)
 
     def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Connexion requise."}, status=401)
         if request.user.role not in ("insider", "admin"):
-            return Response({"detail": "Seuls les insiders peuvent certifier."}, status=403)
-        serializer = CertificationSerializer(data=request.data)
+            return Response({"detail": "Seuls les insiders peuvent statuer sur une information."}, status=403)
+
+        target_type = request.data.get("target_type", Certification.TargetType.ANALYSIS)
+        if target_type not in Certification.TargetType.values:
+            return Response({"detail": "Type de cible inconnu."}, status=400)
+        target = _resolve_target(target_type, request.data.get("target_id", ""))
+        if not target:
+            message = "Site inconnu du wiki." if target_type == Certification.TargetType.SITE else "Dossier introuvable."
+            return Response({"detail": message}, status=404)
+        target_id = target.domain if target_type == Certification.TargetType.SITE else str(target.id)
+
+        payload = {
+            "target_type": target_type,
+            "target_id": target_id,
+            "verdict": request.data.get("verdict", ""),
+            "proposed_status": request.data.get("proposed_status", ""),
+            "comment": request.data.get("comment", ""),
+            "source_url": request.data.get("source_url", ""),
+        }
+        existing = Certification.objects.filter(
+            user=request.user, target_type=target_type, target_id=target_id
+        ).first()
+        serializer = CertificationSerializer(existing, data=payload) if existing else CertificationSerializer(data=payload)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
-        return Response(serializer.data, status=201)
+        reading = serializer.save(user=request.user)
+
+        if target_type == Certification.TargetType.ANALYSIS:
+            from .readings import refresh_analysis
+
+            refresh_analysis(target)
+        else:
+            from apps.knowledge import sites
+
+            sites.evaluate(target)
+
+        return Response(
+            CertificationSerializer(reading).data,
+            status=status.HTTP_200_OK if existing else status.HTTP_201_CREATED,
+        )
+
+
+class CertificationDetailView(APIView):
+    """Retrait d'une lecture : par son auteur, ou par un administrateur (M11)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        reading = Certification.objects.filter(pk=pk).select_related("user").first()
+        if not reading:
+            return Response({"detail": "Lecture introuvable."}, status=404)
+        if reading.user_id != request.user.id and request.user.role != "admin":
+            return Response({"detail": "Seul l'auteur ou un administrateur peut retirer cette lecture."}, status=403)
+        target_type, target_id = reading.target_type, reading.target_id
+        if reading.user_id != request.user.id:
+            from apps.core.models import AuditLog
+
+            AuditLog.objects.create(
+                actor=request.user.email,
+                action="certification_withdraw",
+                target=f"{target_type}:{target_id}",
+                reason=request.data.get("reason", "") if hasattr(request, "data") else "",
+            )
+        reading.delete()
+
+        if target_type == Certification.TargetType.ANALYSIS:
+            from .models import Analysis as AnalysisModel
+            from .readings import refresh_analysis
+
+            analysis = AnalysisModel.objects.filter(id=target_id).first()
+            if analysis:
+                refresh_analysis(analysis)
+        else:
+            from apps.knowledge import sites
+            from apps.knowledge.models import SiteProfile
+
+            site = SiteProfile.objects.filter(domain=target_id).first()
+            if site:
+                sites.evaluate(site)
+        return Response(status=204)
+
+
+class InsiderWorkspaceView(APIView):
+    """Espace de travail des insiders : lectures signées, propositions wiki, file à statuer."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role not in ("insider", "admin"):
+            return Response({"detail": "Espace réservé aux insiders."}, status=403)
+
+        from apps.knowledge.models import WikiPage
+
+        readings = []
+        for reading in Certification.objects.filter(user=request.user).select_related("user").order_by("-updated_at")[:50]:
+            item = CertificationSerializer(reading).data
+            if reading.target_type == Certification.TargetType.ANALYSIS:
+                analysis = Analysis.objects.filter(id=reading.target_id).first()
+                item["target_label"] = (
+                    f"Dossier #{analysis.public_id}" if analysis else "Dossier supprimé"
+                )
+                item["target_url"] = f"/analyses/{analysis.public_id}" if analysis else ""
+            else:
+                item["target_label"] = f"Site {reading.target_id}"
+                item["target_url"] = f"/wiki?q={reading.target_id}"
+            readings.append(item)
+
+        pages = WikiPage.objects.filter(author=request.user).order_by("-updated_at")
+        wiki_pages = [
+            {
+                "slug": page.slug,
+                "title": page.title,
+                "review_status": page.review_status,
+                "review_note": page.review_note,
+                "published": page.published,
+                "updated_at": page.updated_at.isoformat() if page.updated_at else None,
+            }
+            for page in pages[:50]
+        ]
+
+        read_ids = {
+            r.target_id
+            for r in Certification.objects.filter(
+                user=request.user, target_type=Certification.TargetType.ANALYSIS
+            )
+        }
+        queue = []
+        recent = Analysis.objects.filter(
+            status__in=[Analysis.Status.DONE, Analysis.Status.PARTIAL]
+        ).order_by("-created_at")[:40]
+        for analysis in recent:
+            if str(analysis.id) in read_ids:
+                continue
+            queue.append(
+                {
+                    "public_id": analysis.public_id,
+                    "status": analysis.result.get("status", "indeterminee") if analysis.result else "indeterminee",
+                    "status_label": analysis.result.get("status_label", "") if analysis.result else "",
+                    "input_type": analysis.input_type,
+                    "excerpt": (analysis.input_text or analysis.input_url or "Image soumise")[:140],
+                    "created_at": analysis.created_at.isoformat(),
+                }
+            )
+            if len(queue) >= 10:
+                break
+
+        return Response(
+            {
+                "role": request.user.role,
+                "readings": readings,
+                "wiki_pages": wiki_pages,
+                "to_review": queue,
+                "counts": {
+                    "readings": len(readings),
+                    "pending_wiki": sum(1 for p in wiki_pages if p["review_status"] == "pending"),
+                    "to_review": len(queue),
+                },
+            }
+        )
 
 
 class StatusView(APIView):

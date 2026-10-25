@@ -32,7 +32,8 @@ export default async function WikiPage({ searchParams }: { searchParams: Promise
 
       <p className={styles.heroLead} style={{ maxWidth: "42rem" }}>
         Des pages pédagogiques rédigées et vérifiées par des insiders — enseignants, journalistes
-        et spécialistes — avec leurs sources.
+        et spécialistes — avec leurs sources.{" "}
+        <Link href="/sites">Voir aussi les sites de référence</Link> et leur reconnaissance.
       </p>
 
       <form method="get" action="/wiki" className="card card-flat" style={{ marginBottom: "var(--s-5)" }}>

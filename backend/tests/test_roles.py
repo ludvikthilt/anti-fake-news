@@ -3,6 +3,7 @@ from django.core.management import call_command
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User
+from apps.analyses.models import Analysis
 
 
 @pytest.fixture
@@ -10,34 +11,42 @@ def api():
     return APIClient()
 
 
-CERT_PAYLOAD = {
-    "target_type": "analysis",
-    "target_id": "x",
-    "verdict": "certify",
-    "comment": "ok",
-    "source_url": "https://exemple.fr",
-}
+@pytest.fixture
+def analysis():
+    return Analysis.objects.create(input_type=Analysis.InputType.TEXT, input_text="information à vérifier")
+
+
+def cert_payload(analysis, **overrides):
+    payload = {
+        "target_type": "analysis",
+        "target_id": str(analysis.id),
+        "verdict": "certify",
+        "comment": "ok",
+        "source_url": "https://exemple.fr",
+    }
+    payload.update(overrides)
+    return payload
 
 
 @pytest.mark.django_db
-def test_certification_requires_insider(api):
+def test_certification_requires_insider(api, analysis):
     user = User.objects.create_user(email="user@test.fr", password="pass12345", role="user")
     api.force_authenticate(user)
-    assert api.post("/api/certifications/", CERT_PAYLOAD, format="json").status_code == 403
+    assert api.post("/api/certifications/", cert_payload(analysis), format="json").status_code == 403
 
 
 @pytest.mark.django_db
-def test_certification_allowed_for_insider(api):
+def test_certification_allowed_for_insider(api, analysis):
     user = User.objects.create_user(email="insider@test.fr", password="pass12345", role="insider")
     api.force_authenticate(user)
-    assert api.post("/api/certifications/", CERT_PAYLOAD, format="json").status_code == 201
+    assert api.post("/api/certifications/", cert_payload(analysis), format="json").status_code == 201
 
 
 @pytest.mark.django_db
-def test_certification_requires_source(api):
+def test_certification_requires_source(api, analysis):
     user = User.objects.create_user(email="insider2@test.fr", password="pass12345", role="insider")
     api.force_authenticate(user)
-    payload = {**CERT_PAYLOAD, "source_url": ""}
+    payload = cert_payload(analysis, source_url="")
     assert api.post("/api/certifications/", payload, format="json").status_code == 400
 
 

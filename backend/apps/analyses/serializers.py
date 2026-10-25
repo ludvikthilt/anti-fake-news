@@ -52,12 +52,25 @@ class AnalysisDetailSerializer(serializers.ModelSerializer):
 
 
 class CertificationSerializer(serializers.ModelSerializer):
+    """Lecture d'insider : verdict (certifie/conteste) et statut proposé."""
+
+    insider = serializers.SerializerMethodField()
+
     class Meta:
         model = Certification
-        fields = ("id", "target_type", "target_id", "verdict", "comment", "source_url", "created_at")
-        read_only_fields = ("created_at",)
+        fields = (
+            "id", "target_type", "target_id", "verdict", "proposed_status",
+            "comment", "source_url", "insider", "created_at", "updated_at",
+        )
+        read_only_fields = ("created_at", "updated_at")
+
+    def get_insider(self, obj):
+        return obj.user.name or obj.user.email if obj.user else ""
 
     def validate(self, attrs):
-        if not attrs.get("source_url", "").strip():
+        if not (attrs.get("source_url") or "").strip():
             raise serializers.ValidationError("Une source est obligatoire pour certifier ou contester.")
+        proposed = attrs.get("proposed_status") or ""
+        if proposed and proposed not in Certification.ProposedStatus.values:
+            raise serializers.ValidationError("Statut proposé inconnu.")
         return attrs
