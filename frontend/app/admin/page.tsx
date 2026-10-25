@@ -53,6 +53,51 @@ interface PendingWikiRow {
   created_at: string;
 }
 
+interface SiteRow {
+  domain: string;
+  name: string;
+  nature: string;
+  score: number;
+  certified: boolean;
+  certified_at: string | null;
+  revoked: boolean;
+  revoked_reason: string;
+  near: boolean;
+  progress: number;
+  system_validations: number;
+  system_quota: number;
+  insider_certifications: number;
+  insider_contests: number;
+  insider_net: number;
+  insider_quota: number;
+  readings: number;
+}
+
+interface SitesPayload {
+  system_quota: number;
+  insider_quota: number;
+  near: number;
+  certified: number;
+  revoked: number;
+  sites: SiteRow[];
+}
+
+const NATURE_LABELS: Record<string, string> = {
+  agency: "Agence de presse",
+  institution: "Institution publique",
+  media: "Média d'information",
+  blog: "Blog",
+  social: "Réseau social",
+  unknown: "Site inconnu",
+};
+
+function sitePill(site: SiteRow): { label: string; tone: string } {
+  if (site.certified) return { label: "Certifié", tone: "ok" };
+  if (site.revoked) return { label: "Reconnaissance retirée", tone: "bad" };
+  if (site.near) return { label: "En observation", tone: "warn" };
+  return { label: "Non engagé", tone: "" };
+}
+
 interface ReadingRow {
   id: number;
   target_type: string;
@@ -103,6 +148,7 @@ export default function AdminPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [requests, setRequests] = useState<InsiderRequestRow[]>([]);
   const [pendingWiki, setPendingWiki] = useState<PendingWikiRow[]>([]);
+  const [sitesData, setSitesData] = useState<SitesPayload | null>(null);
   const [readings, setReadings] = useState<ReadingRow[]>([]);
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
   const [title, setTitle] = useState("");
@@ -133,9 +179,13 @@ export default function AdminPage() {
     setReadings(await api<ReadingRow[]>("/admin/certifications/"));
   }, []);
 
+  const loadSites = useCallback(async () => {
+    setSitesData(await api<SitesPayload>("/admin/sites/"));
+  }, []);
+
   const loadAll = useCallback(async () => {
-    await Promise.all([loadStats(), loadRequests(), loadPendingWiki(), loadReadings()]);
-  }, [loadStats, loadRequests, loadPendingWiki, loadReadings]);
+    await Promise.all([loadStats(), loadRequests(), loadPendingWiki(), loadReadings(), loadSites()]);
+  }, [loadStats, loadRequests, loadPendingWiki, loadReadings, loadSites]);
 
   useEffect(() => {
     loadAll().catch((e) => setError(e instanceof Error ? e.message : "Accès réservé."));
@@ -177,6 +227,25 @@ export default function AdminPage() {
       });
       setReviewNotes((notes) => ({ ...notes, [slug]: "" }));
     }, decision === "approve" ? "Fiche publiée sur le wiki." : "Fiche refusée.");
+  }
+
+  function decideSite(domain: string, action: "revoke" | "restore") {
+    const message =
+      action === "revoke"
+        ? `Retirer la reconnaissance automatique de ${domain} ?`
+        : `Rétablir la reconnaissance de ${domain} (si les quotas sont atteints) ?`;
+    if (!window.confirm(message)) return;
+    run(async () => {
+      await api(`/admin/sites/${domain}/${action}/`, {
+        method: "POST",
+        body: {
+          reason:
+            action === "revoke"
+              ? window.prompt("Motif du retrait (facultatif)") || ""
+              : "",
+        },
+      });
+    }, action === "revoke" ? "Reconnaissance retirée." : "Reconnaissance rétablie.");
   }
 
   function withdrawReading(id: number) {
@@ -356,6 +425,130 @@ export default function AdminPage() {
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="section" aria-labelledby="sites-titre">
+        <h2 id="sites-titre" className="sectionTitle">Sites et reconnaissance</h2>
+        <p className="hint" style={{ marginBottom: "var(--s-3)" }}>
+          Un site n&apos;est reconnu fiable que si les deux quotas sont atteints :{" "}
+          {sitesData?.system_quota ?? 5} corroborations constatées par le système{" "}
+          <strong>et</strong> {sitesData?.insider_quota ?? 3} insiders certifiants distincts.
+          Une seule lecture d&apos;insider ne suffit jamais.
+        </p>
+        {!sitesData || sitesData.sites.length === 0 ? (
+          <div className="card card-flat">
+            <p className="muted" style={{ margin: 0, fontSize: "var(--fs-sm)" }}>
+              Aucun site rencontré pour le moment : chaque analyse en crée automatiquement.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="cluster" style={{ marginBottom: "var(--s-3)", gap: "var(--s-2)" }}>
+              <span className="pill ok">{sitesData.certified} certifié(s)</span>
+              <span className="pill warn">{sitesData.near} en observation</span>
+              <span className="pill bad">{sitesData.revoked} reconnaissance(s) retirée(s)</span>
+            </div>
+            <div className="tableWrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Site</th>
+                    <th>Corroborations système</th>
+                    <th>Insiders (solde)</th>
+                    <th>Progression</th>
+                    <th>État</th>
+                    <th aria-label="Actions" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {sitesData.sites.slice(0, 30).map((site) => {
+                    const pill = sitePill(site);
+                    return (
+                      <tr key={site.domain}>
+                        <td>
+                          <strong style={{ display: "block" }}>{site.domain}</strong>
+                          <span className="hint">
+                            {site.name || site.domain} · {NATURE_LABELS[site.nature] || site.nature}
+                          </span>
+                          {site.revoked && site.revoked_reason && (
+                            <span className="hint" style={{ display: "block" }}>
+                              Motif : {site.revoked_reason}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {site.system_validations} / {site.system_quota}
+                        </td>
+                        <td>
+                          {site.insider_net} / {site.insider_quota}
+                          <span className="hint">
+                            {" "}({site.insider_certifications} certif. · {site.insider_contests} contest.)
+                          </span>
+                        </td>
+                        <td style={{ minWidth: 140 }}>
+                          <span className="cluster" style={{ gap: "var(--s-2)", flexWrap: "nowrap" }}>
+                            <span
+                              aria-hidden
+                              style={{
+                                display: "inline-block",
+                                width: 70,
+                                height: 6,
+                                borderRadius: 99,
+                                background: "var(--brand-100)",
+                                overflow: "hidden",
+                                flex: "none",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  display: "block",
+                                  height: "100%",
+                                  width: `${site.progress}%`,
+                                  borderRadius: 99,
+                                  background: site.certified
+                                    ? "var(--ok-fg)"
+                                    : site.revoked
+                                      ? "var(--bad-fg)"
+                                      : "var(--warn-fg)",
+                                }}
+                              />
+                            </span>
+                            <span className="pill">{site.progress} %</span>
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`pill ${pill.tone}`}>{pill.label}</span>
+                        </td>
+                        <td>
+                          <span className="cluster">
+                            {site.certified && (
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() => decideSite(site.domain, "revoke")}
+                                disabled={busy}
+                              >
+                                <X size={14} /> Retirer
+                              </button>
+                            )}
+                            {site.revoked && (
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => decideSite(site.domain, "restore")}
+                                disabled={busy}
+                              >
+                                <ShieldCheck size={14} /> Rétablir
+                              </button>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 

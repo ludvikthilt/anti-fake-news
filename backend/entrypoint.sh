@@ -24,6 +24,20 @@ if [ -n "${DJANGO_SUPERUSER_EMAIL:-}" ] || [ -n "${DJANGO_SUPERUSER_PASSWORD:-}"
     python manage.py ensure_superuser
 fi
 
+# Données de démonstration : peuplées automatiquement au premier démarrage (et à chaque
+# redémarrage, la commande est idempotente). Désactivable avec SEED_DEMO=false.
+if [ "${SEED_DEMO:-true}" = "true" ]; then
+    echo "[entrée] données de démonstration (idempotent)"
+    python manage.py seed_demo || {
+        echo "[entrée] seed_demo a échoué : base non peuplée (relancer après correction)" >&2
+    }
+    # Indexe les fragments du chatbot (embeddings Gemini) ; sans clé, la commande le signale
+    # et le chatbot reste en recherche plein texte.
+    python manage.py index_knowledge || {
+        echo "[entrée] index_knowledge a échoué : chatbot en recherche plein texte" >&2
+    }
+fi
+
 echo "[entrée] gunicorn"
 exec gunicorn config.wsgi:application \
     --bind "0.0.0.0:${PORT:-8000}" \

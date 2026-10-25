@@ -128,6 +128,19 @@ trois ressources : `antifake-db`, `antifake-api`, `antifake-web`.
    `GOOGLE_CLIENT_ID` et `API_URL` à l'exécution via `/runtime-config.js` : le blueprint fournit
    déjà le client OAuth, et ces valeurs se changent sans reconstruire l'image.
 7. Redéclarer le webhook Telegram sur `https://<api>.onrender.com/api/webhooks/telegram/`.
+8. **Données de démonstration** : **automatique**. À chaque démarrage, `entrypoint.sh` exécute
+   `migrate`, `seed_demo` puis `index_knowledge` avant de lancer gunicorn — aucune connexion au
+   Shell n'est nécessaire. La base est alors remplie : le chatbot a son corpus
+   (`knowledge_chunk`), l'historique affiche des dossiers pour les quatre statuts,
+   l'administration montre ses demandes, fiches, campagnes et quotas, et deux sites servent de
+   démonstration (un certifié automatiquement, un « en observation »). `seed_demo` est
+   idempotent : relancer ne duplique rien.
+   - Désactiver le peuplement : variable `SEED_DEMO=false` sur `antifake-api` (utile pour
+     démarrer sur une base vide).
+   - Ajoutez `DEMO_PASSWORD` si vous voulez ouvrir l'un des comptes fictifs `@example.org`
+     (sinon ces comptes n'ont aucun mot de passe utilisable ; aucun compte Telegram n'est lié).
+   - Un échec de ces étapes est signalé dans les logs sans bloquer le démarrage du service
+     (la recherche reste alors en mode plein texte, la base reste vide).
 
 > **Offre gratuite** : les services s'endorment après une période d'inactivité (le premier appel
 > après réveil prend quelques dizaines de secondes) et le service PostgreSQL gratuit est limité

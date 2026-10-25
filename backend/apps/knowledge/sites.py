@@ -64,10 +64,27 @@ def evaluation(site: SiteProfile) -> dict:
     """État de reconnaissance d'un site et ce qu'il lui reste à accomplir."""
     system_quota, insider_quota = quotas()
     tally = insider_tally(site.domain)
-    certified = site.system_validations >= system_quota and tally["net"] >= insider_quota
+    # Une reconnaissance retirée par un administrateur empêche la certification,
+    # même si les quotas sont atteints : elle ne revient qu'après rétablissement.
+    certified = (
+        not site.recognition_revoked
+        and site.system_validations >= system_quota
+        and tally["net"] >= insider_quota
+    )
     return {
         "domain": site.domain,
+        "name": site.name,
+        "nature": site.nature,
+        "score": site.score,
         "certified": certified,
+        "revoked": site.recognition_revoked,
+        "revoked_at": site.revoked_at.isoformat() if site.revoked_at else None,
+        "revoked_reason": site.revoked_reason,
+        "near": (
+            not site.recognition_revoked
+            and not certified
+            and (site.system_validations > 0 or tally["net"] > 0)
+        ),
         "certified_at": site.certified_at.isoformat() if site.certified_at else None,
         "system_validations": site.system_validations,
         "system_quota": system_quota,
@@ -98,6 +115,24 @@ def evaluate(site: SiteProfile) -> dict:
     if changed:
         site.save(update_fields=changed)
     return state
+
+
+def revoke(site: SiteProfile, reason: str = "") -> dict:
+    """Retrait manuel de la reconnaissance (action administrateur, journalisée)."""
+    site.recognition_revoked = True
+    site.revoked_at = timezone.now()
+    site.revoked_reason = (reason or "").strip()[:500]
+    site.save(update_fields=["recognition_revoked", "revoked_at", "revoked_reason"])
+    return evaluate(site)
+
+
+def restore(site: SiteProfile) -> dict:
+    """Rétablissement : la reconnaissance revient si les quotas sont encore atteints."""
+    site.recognition_revoked = False
+    site.revoked_at = None
+    site.revoked_reason = ""
+    site.save(update_fields=["recognition_revoked", "revoked_at", "revoked_reason"])
+    return evaluate(site)
 
 
 def remember_domain(domain: str, name: str = "", nature: str = "unknown", score: int = 20) -> SiteProfile | None:

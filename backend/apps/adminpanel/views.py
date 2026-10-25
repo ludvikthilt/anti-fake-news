@@ -266,6 +266,100 @@ class CertificationAdminView(APIView):
         return Response({"withdrawn": True, "reason": reason})
 
 
+def _site_admin_row(site) -> dict:
+    """État de reconnaissance d'un site, pour le suivi administrateur."""
+    from apps.knowledge import sites as sites_service
+
+    state = sites_service.evaluation(site)
+    progress = round(
+        100
+        * (
+            min(state["system_validations"], state["system_quota"])
+            + min(state["insider_net"], state["insider_quota"])
+        )
+        / max(state["system_quota"] + state["insider_quota"], 1)
+    )
+    return {
+        **state,
+        "progress": progress,
+        "readings": Certification.objects.filter(
+            target_type=Certification.TargetType.SITE, target_id=site.domain
+        ).count(),
+    }
+
+
+def _site_group(row: dict) -> int:
+    """Ordre d'affichage : certifiés, puis quasi-certifiés, puis retraites, puis le reste."""
+    if row["certified"]:
+        return 0
+    if row["revoked"]:
+        return 2
+    if row["near"]:
+        return 1
+    return 3
+
+
+class SiteAdminView(APIView):
+    """Suivi des sites : quasi-certifiés (progression des deux quotas) et reconnaissance retirée."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not _is_admin(request.user):
+            return Response({"detail": "Réservé aux administrateurs."}, status=403)
+        from apps.knowledge import sites as sites_service
+        from apps.knowledge.models import SiteProfile
+
+        system_quota, insider_quota = sites_service.quotas()
+        rows = [_site_admin_row(site) for site in SiteProfile.objects.all()[:200]]
+        rows.sort(key=lambda r: (_site_group(r), -r["progress"], r["domain"]))
+        return Response({
+            "system_quota": system_quota,
+            "insider_quota": insider_quota,
+            "near": sum(1 for r in rows if r["near"]),
+            "certified": sum(1 for r in rows if r["certified"]),
+            "revoked": sum(1 for r in rows if r["revoked"]),
+            "sites": rows,
+        })
+
+
+class SiteRecognitionAdminView(APIView):
+    """Retirer ou rétablir manuellement la reconnaissance automatique d'un site."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, domain, action):
+        if not _is_admin(request.user):
+            return Response({"detail": "Réservé aux administrateurs."}, status=403)
+        from apps.core.models import AuditLog
+        from apps.knowledge import sites as sites_service
+        from apps.knowledge.models import SiteProfile
+
+        site = SiteProfile.objects.filter(domain=domain.lower()).first()
+        if not site:
+            return Response({"detail": "Site introuvable."}, status=404)
+        if action == "revoke":
+            reason = (request.data.get("reason") or "").strip()
+            state = sites_service.revoke(site, reason)
+            AuditLog.objects.create(
+                actor=request.user.email,
+                action="site_recognition_revoke",
+                target=site.domain,
+                reason=reason,
+            )
+        elif action == "restore":
+            state = sites_service.restore(site)
+            AuditLog.objects.create(
+                actor=request.user.email,
+                action="site_recognition_restore",
+                target=site.domain,
+                reason=(request.data.get("reason") or "").strip(),
+            )
+        else:
+            return Response({"detail": "Action inconnue."}, status=400)
+        return Response(_site_admin_row(SiteProfile.objects.get(pk=site.pk)) | {"state": state})
+
+
 class UserAdminView(APIView):
     permission_classes = [IsAuthenticated]
 

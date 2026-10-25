@@ -51,6 +51,10 @@ services:
         value: tavily
       - key: EMAIL_FROM
         value: ludviktybho@gmail.com
+      # Peuplement automatique des données de démonstration au démarrage (idempotent).
+      # Passer à "false" pour démarrer sur une base vide.
+      - key: SEED_DEMO
+        value: "true"
       # Clés à saisir dans le tableau de bord (jamais dans ce fichier).
       - key: TAVILY_API_KEY
         sync: false

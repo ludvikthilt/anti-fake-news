@@ -27,6 +27,11 @@ class SiteProfile(models.Model):
     certified = models.BooleanField(default=False)
     certified_at = models.DateTimeField(null=True, blank=True)
     system_validations = models.PositiveIntegerField(default=0)
+    # Retrait manuel de la reconnaissance (M11) : un administrateur peut suspendre
+    # la confiance automatique d'un site ; elle ne revient que par rétablissement.
+    recognition_revoked = models.BooleanField(default=False)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revoked_reason = models.TextField(blank=True)
 
     class Meta:
         ordering = ["domain"]

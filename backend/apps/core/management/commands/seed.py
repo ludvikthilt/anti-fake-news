@@ -5,6 +5,7 @@
 - Fragments RAG pour la recherche « base propre ».
 """
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from apps.knowledge.models import KnowledgeChunk, SiteProfile, WikiPage
 
@@ -100,7 +101,15 @@ class Command(BaseCommand):
         for slug, title, content in WIKI:
             page, _ = WikiPage.objects.update_or_create(
                 slug=slug,
-                defaults={"title": title, "content": content, "published": True},
+                defaults={
+                    "title": title,
+                    "content": content,
+                    "published": True,
+                    # Pages de référence déjà validées : elles n'ont pas à apparaître
+                    # dans la file « fiches à valider » de l'administration.
+                    "review_status": WikiPage.ReviewStatus.APPROVED,
+                    "reviewed_at": timezone.now(),
+                },
             )
             KnowledgeChunk.objects.update_or_create(
                 ref_type="wiki", ref_id=str(page.id),

@@ -53,9 +53,10 @@ createdb -U postgres antifake                        # ou via psql
 # 2. Configurer .env (copier .env.example) avec :
 #    DATABASE_URL=postgresql://postgres:MOT_DE_PASSE@localhost:5432/antifake
 
-# 3. Migrer, peupler la base de référence, créer l'admin
+# 3. Migrer, peupler la base, créer l'admin
 .venv/Scripts/python manage.py migrate
-.venv/Scripts/python manage.py seed
+.venv/Scripts/python manage.py seed        # base de référence (sites, wiki, RAG)
+.venv/Scripts/python manage.py seed_demo   # + données de démonstration complètes
 .venv/Scripts/python manage.py createsuperuser
 
 # 4. Lancer
@@ -64,6 +65,17 @@ createdb -U postgres antifake                        # ou via psql
 
 Compte de démonstration local (déjà créé via seed) :
 - E-mail : `admin@antifake.local` — mot de passe : `admin12345` (rôle **Administrateur**).
+
+`seed_demo` ajoute des données de démonstration : six comptes fictifs (`@example.org`, sans
+compte Telegram), neuf dossiers d'analyse couvrant les quatre statuts, des lectures d'insiders,
+un site certifié et un site « en observation », des fiches wiki en attente de validation, des
+campagnes, des notifications et la consommation des quotas du mois. La commande est
+idempotente (relançable sans doublon) ; définissez `DEMO_PASSWORD` si vous souhaitez connecter
+les comptes fictifs, sinon ils n'ont aucun mot de passe utilisable.
+
+> Sur Render, cette étape est **automatique** : `entrypoint.sh` lance `migrate`, `seed_demo` et
+> `index_knowledge` à chaque démarrage (désactivable avec `SEED_DEMO=false`). Voir
+> [DEPLOIEMENT.md](DEPLOIEMENT.md).
 
 API : `http://127.0.0.1:8000/api/` · Schéma OpenAPI : `/api/schema/` · Swagger : `/api/docs/` · Admin Django : `/admin/`.
 
